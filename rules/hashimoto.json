@@ -1,0 +1,216 @@
+{
+  "_comment": "PROFIL HASHIMOTO - VERSION BROUILLON. Ces règles sont un point de départ NON VALIDÉ médicalement. Elles doivent être relues et amendées par un professionnel de santé (médecin endocrinologue / diététicien-nutritionniste) avant tout lancement. Les clés commençant par '_' sont des commentaires ignorés par le moteur.",
+
+  "_howToEdit": "Chaque règle se déclenche AU PLUS UNE FOIS. 'match' est un OU : la règle s'applique si au moins un critère correspond. Les identifiants sont les tags normalisés Open Food Facts (ex. en:wheat) : ils sont indépendants de la langue de l'étiquette. 'points' est ajouté (ou retiré) au score de base. 'reasonKey' renvoie à un texte dans src/i18n/messages/*.json. '*' dans allergens/traces = n'importe quelle valeur. Pour un autre profil (AIP, cœliaque...), copier ce fichier en rules/<profil>.json, adapter les règles, puis l'enregistrer dans rules/index.ts : aucun code du moteur à modifier.",
+
+  "profile": "hashimoto",
+  "version": "0.1.0-draft",
+  "validation": {
+    "status": "DRAFT",
+    "validatedBy": null,
+    "validatedOn": null,
+    "_note": "Passer status à VALIDATED et renseigner validatedBy/validatedOn uniquement après relecture écrite par un professionnel de santé."
+  },
+
+  "scoring": {
+    "base": 50,
+    "min": 0,
+    "max": 100,
+    "_thresholds": "score >= green => vert ; >= orange => orange ; sinon rouge.",
+    "thresholds": { "green": 65, "orange": 40 },
+    "_caps": "Plafond du cumul des bonus, pour qu'un produit très mauvais par ailleurs ne soit pas 'sauvé' par quelques points positifs.",
+    "caps": { "maxBonus": 30 }
+  },
+
+  "dataRequirements": {
+    "_comment": "En dessous de ce nombre d'ingrédients normalisés (et sans additifs), on affiche 'données insuffisantes' plutôt qu'un score inventé.",
+    "minIngredientTags": 1
+  },
+
+  "rules": [
+    {
+      "_section": "=== MALUS FORTS ===",
+      "id": "gluten",
+      "category": "strong_malus",
+      "points": -25,
+      "severity": "negative",
+      "reasonKey": "reason.gluten",
+      "match": {
+        "ingredients": ["en:wheat", "en:barley", "en:rye", "en:spelt", "en:kamut", "en:triticale", "en:durum-wheat", "en:semolina", "en:gluten", "en:wheat-gluten", "en:malt", "en:barley-malt"],
+        "allergens": ["en:gluten"]
+      }
+    },
+    {
+      "id": "soy",
+      "category": "strong_malus",
+      "points": -20,
+      "severity": "negative",
+      "reasonKey": "reason.soy",
+      "_note": "Peut se cumuler avec l'huile de soja (règle refined_oils) : volontaire, à discuter avec le validateur.",
+      "match": {
+        "ingredients": ["en:soy", "en:soya-bean", "en:soy-protein", "en:soy-lecithin", "en:soy-sauce", "en:soy-flour", "en:tofu"],
+        "allergens": ["en:soybeans"]
+      }
+    },
+    {
+      "id": "added_sugars",
+      "category": "strong_malus",
+      "points": -20,
+      "severity": "negative",
+      "reasonKey": "reason.added_sugars",
+      "match": {
+        "ingredients": ["en:sugar", "en:cane-sugar", "en:brown-sugar", "en:icing-sugar", "en:glucose-syrup", "en:glucose-fructose-syrup", "en:corn-syrup", "en:fructose", "en:dextrose", "en:invert-sugar", "en:caramel", "en:syrup"]
+      }
+    },
+
+    {
+      "_section": "=== MALUS MOYENS ===",
+      "id": "ultra_processed",
+      "category": "medium_malus",
+      "points": -12,
+      "severity": "negative",
+      "reasonKey": "reason.ultra_processed",
+      "match": { "nova": [4] }
+    },
+    {
+      "id": "emulsifiers",
+      "category": "medium_malus",
+      "points": -8,
+      "severity": "negative",
+      "reasonKey": "reason.emulsifiers",
+      "_note": "Liste d'additifs émulsifiants à faire valider (E322 lécithines volontairement exclu).",
+      "match": {
+        "additives": ["en:e433", "en:e435", "en:e436", "en:e466", "en:e471", "en:e472a", "en:e472b", "en:e472c", "en:e472d", "en:e472e", "en:e472f", "en:e473", "en:e474", "en:e475", "en:e477", "en:e481", "en:e482", "en:e491", "en:e492", "en:e493", "en:e494", "en:e495"]
+      }
+    },
+    {
+      "id": "sweeteners",
+      "category": "medium_malus",
+      "points": -10,
+      "severity": "negative",
+      "reasonKey": "reason.sweeteners",
+      "match": {
+        "additives": ["en:e950", "en:e951", "en:e952", "en:e953", "en:e954", "en:e955", "en:e957", "en:e959", "en:e960", "en:e961", "en:e962", "en:e965", "en:e966", "en:e967", "en:e968", "en:e969"],
+        "ingredients": ["en:sweetener"]
+      }
+    },
+    {
+      "id": "refined_oils",
+      "category": "medium_malus",
+      "points": -8,
+      "severity": "negative",
+      "reasonKey": "reason.refined_oils",
+      "_note": "OFF n'indique pas si l'huile est raffinée : on cible les huiles généralement raffinées.",
+      "match": {
+        "ingredients": ["en:sunflower-oil", "en:corn-oil", "en:soybean-oil", "en:cottonseed-oil", "en:safflower-oil"]
+      }
+    },
+    {
+      "id": "high_sugar_content",
+      "category": "medium_malus",
+      "points": -8,
+      "severity": "negative",
+      "reasonKey": "reason.high_sugar_content",
+      "_note": "Valeurs OFF en grammes pour 100 g.",
+      "match": { "nutriments": [{ "key": "sugars_100g", "op": "gte", "value": 15 }] }
+    },
+
+    {
+      "_section": "=== ALERTES ===",
+      "id": "iodine_excess",
+      "category": "alert",
+      "points": -10,
+      "severity": "warning",
+      "forceMaxLevel": "orange",
+      "reasonKey": "reason.iodine_excess",
+      "_note": "Algues = source d'iode potentiellement très élevée. Le produit ne peut pas dépasser 'orange'.",
+      "match": {
+        "ingredients": ["en:kelp", "en:seaweed", "en:laminaria", "en:wakame", "en:kombu", "en:fucus", "en:bladderwrack", "en:nori", "en:dulse"]
+      }
+    },
+    {
+      "id": "iodised_salt",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.iodised_salt",
+      "match": { "ingredients": ["en:iodised-salt"] }
+    },
+    {
+      "id": "gluten_traces",
+      "category": "alert",
+      "points": -5,
+      "severity": "warning",
+      "reasonKey": "reason.gluten_traces",
+      "match": { "traces": ["en:gluten"] }
+    },
+    {
+      "id": "allergens_declared",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.allergens_declared",
+      "match": { "allergens": ["*"] }
+    },
+    {
+      "id": "traces_declared",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.traces_declared",
+      "match": { "traces": ["*"] }
+    },
+
+    {
+      "_section": "=== BONUS ===",
+      "_nutrimentUnits": "Les nutriments OFF *_100g sont en grammes : 0.000008 g = 8 µg.",
+      "id": "selenium",
+      "category": "bonus",
+      "points": 8,
+      "severity": "positive",
+      "reasonKey": "reason.selenium",
+      "match": {
+        "ingredients": ["en:brazil-nut"],
+        "nutriments": [{ "key": "selenium_100g", "op": "gte", "value": 0.000008 }]
+      }
+    },
+    {
+      "id": "zinc",
+      "category": "bonus",
+      "points": 6,
+      "severity": "positive",
+      "reasonKey": "reason.zinc",
+      "match": {
+        "ingredients": ["en:pumpkin-seed", "en:oyster"],
+        "nutriments": [{ "key": "zinc_100g", "op": "gte", "value": 0.0015 }]
+      }
+    },
+    {
+      "id": "omega3",
+      "category": "bonus",
+      "points": 8,
+      "severity": "positive",
+      "reasonKey": "reason.omega3",
+      "match": {
+        "ingredients": ["en:flaxseed", "en:linseed", "en:chia-seed", "en:walnut", "en:salmon", "en:mackerel", "en:sardine", "en:herring", "en:anchovy"],
+        "nutriments": [{ "key": "omega-3-fat_100g", "op": "gte", "value": 0.5 }]
+      }
+    },
+    {
+      "id": "fiber",
+      "category": "bonus",
+      "points": 6,
+      "severity": "positive",
+      "reasonKey": "reason.fiber",
+      "match": { "nutriments": [{ "key": "fiber_100g", "op": "gte", "value": 3 }] }
+    },
+    {
+      "id": "minimally_processed",
+      "category": "bonus",
+      "points": 15,
+      "severity": "positive",
+      "reasonKey": "reason.minimally_processed",
+      "match": { "nova": [1] }
+    }
+  ]
+}

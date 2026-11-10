@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * JETONS DE COULEUR. Deux thèmes ; le mode « auto » suit prefers-color-scheme en CSS pur (aucun JS, aucun flash).
+ * public/theme-init.js ne fait que poser data-theme / data-text avant le premier rendu.
+ * Les contrastes WCAG AA de ces jetons sont vérifiés par src/lib/theme.test.ts (qui lit CE fichier) :
+ * si vous changez une valeur, relancez `npm test`. Les trois blocs sombres doivent rester identiques.
+ */
+:root {
+  --canvas: #f4f8f7;
+  --surface: #ffffff;
+  --ink: #1f2933;
+  --muted: #3e4c59;
+  --line: #cbd2d9;
+  --line-strong: #616e7c;
+  --primary: #255a54;
+  --on-primary: #ffffff;
+  --primary-hover: #2f6f68;
+  --primary-soft: #e3eeec;
+  --ok-bg: #e4f4e8;
+  --ok-fg: #14532d;
+  --ok-ring: #2e7d4f;
+  --warn-bg: #fdf0d9;
+  --warn-fg: #7a3e00;
+  --warn-ring: #b35c00;
+  --bad-bg: #fbe4e4;
+  --bad-fg: #7f1d1d;
+  --bad-ring: #b42323;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --canvas: #0f1a19;
+  --surface: #172625;
+  --ink: #e6eeed;
+  --muted: #b7c4c2;
+  --line: #2c4140;
+  --line-strong: #7f9794;
+  --primary: #8fd6cc;
+  --on-primary: #0b1d1b;
+  --primary-hover: #a8e2da;
+  --primary-soft: #1f3836;
+  --ok-bg: #123524;
+  --ok-fg: #b7f0cb;
+  --ok-ring: #4cc380;
+  --warn-bg: #3d2a0a;
+  --warn-fg: #fcd9a0;
+  --warn-ring: #e0953a;
+  --bad-bg: #4a1616;
+  --bad-fg: #fecaca;
+  --bad-ring: #ef6b6b;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    --canvas: #0f1a19;
+    --surface: #172625;
+    --ink: #e6eeed;
+    --muted: #b7c4c2;
+    --line: #2c4140;
+    --line-strong: #7f9794;
+    --primary: #8fd6cc;
+    --on-primary: #0b1d1b;
+    --primary-hover: #a8e2da;
+    --primary-soft: #1f3836;
+    --ok-bg: #123524;
+    --ok-fg: #b7f0cb;
+    --ok-ring: #4cc380;
+    --warn-bg: #3d2a0a;
+    --warn-fg: #fcd9a0;
+    --warn-ring: #e0953a;
+    --bad-bg: #4a1616;
+    --bad-fg: #fecaca;
+    --bad-ring: #ef6b6b;
+    color-scheme: dark;
+  }
+}
+
+/* Taille du texte : tout le design est en rem, donc tout suit. Pourcentages de la taille du navigateur. */
+html { font-size: 112.5%; }
+html[data-text="small"] { font-size: 100%; }
+html[data-text="normal"] { font-size: 112.5%; }
+html[data-text="large"] { font-size: 131.25%; }
+html[data-text="xlarge"] { font-size: 150%; }
+
+@layer base {
+  body { @apply bg-canvas text-ink antialiased; overflow-wrap: anywhere; }
+  :focus-visible { @apply outline-4 outline-offset-2 outline-primary; }
+}
+
+@layer components {
+  /* Cibles tactiles >= 3rem, contraste >= 4.5:1 */
+  .btn-primary { @apply inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-5 py-3 text-center text-lg font-semibold text-on-primary; }
+  .btn-primary:hover { @apply bg-primary-hover; }
+  .btn-secondary { @apply inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-primary bg-surface px-5 py-3 text-center text-lg font-semibold text-primary; }
+  .btn-secondary:hover { @apply bg-primary-soft; }
+  .btn-secondary:disabled { @apply cursor-not-allowed opacity-50; }
+  .h-18 { height: 4.5rem; } .w-18 { width: 4.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
