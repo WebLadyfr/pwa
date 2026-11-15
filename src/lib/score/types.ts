@@ -45,6 +45,8 @@ export interface Rule {
   reasonKey: string;
   match: RuleMatch;
   forceMaxLevel?: Level;
+  /** Renseigné par la fusion de profils : profils dont la règle provient. */
+  profiles?: string[];
 }
 
 export interface RuleSet {
@@ -70,6 +72,8 @@ export interface Reason {
   points: number;
   /** Ids bruts ayant déclenché la règle (ex. "en:sugar", "nova:4", "sugars_100g"). */
   items: string[];
+  /** Profils concernés (uniquement quand plusieurs profils sont combinés). */
+  profiles?: string[];
 }
 
 export type ScoreResult =

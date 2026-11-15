@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useEffect, useRef, useState } from "react";
 import { t } from "@/i18n";
 import { isValidGtin } from "@/lib/barcode";
@@ -71,8 +72,8 @@ export function Scanner({ onCode }: { onCode: (code: string) => void }) {
           <button type="button" className="btn-secondary" onClick={() => setActive(false)}>{t("scan.stop")}</button>
         </>
       ) : (
-        <button type="button" className="btn-primary" onClick={() => { setError(null); setActive(true); }}>
-          <span aria-hidden="true">📷 </span>{t("scan.start")}
+        <button type="button" data-tour="scan-start" className="btn-primary" onClick={() => { setError(null); setActive(true); }}>
+          <Icon name="camera" className="me-2 h-5 w-5" />{t("scan.start")}
         </button>
       )}
       {error && <p role="alert" className="rounded-xl bg-warn-bg p-3 text-warn-fg">{t(`scan.camera.${error}`)}</p>}

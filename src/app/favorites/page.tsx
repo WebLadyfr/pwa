@@ -1,7 +1,8 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { t } from "@/i18n";
+import { dateLocale, t } from "@/i18n";
 import { refreshAll, type Favorite } from "@/lib/favorites";
 import { getActiveRuleSet } from "@/lib/ruleset";
 import { CHANGE_EVENT, consentStatus, getFavorites, removeFavorite, saveFavorites } from "@/lib/storage";
@@ -39,7 +40,7 @@ export default function FavoritesPage() {
                 <span className="block font-medium">{f.product.name ?? t("result.unknownName")}</span>
                 {f.product.brands && <span className="block text-sm text-muted">{f.product.brands}</span>}
                 <span className="block text-sm text-muted">
-                  {t("favorites.computed", { date: new Date(f.computed.at).toLocaleDateString("fr-FR") })}
+                  {t("favorites.computed", { date: new Date(f.computed.at).toLocaleDateString(dateLocale()) })}
                 </span>
               </span>
               <MiniScore score={f.computed.score} level={f.computed.level} />
@@ -48,9 +49,9 @@ export default function FavoritesPage() {
               type="button"
               onClick={() => removeFavorite(f.code)}
               aria-label={`${t("favorites.remove")} : ${f.product.name ?? f.code}`}
-              className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-xl border-2 border-primary bg-primary-soft text-2xl text-primary"
+              className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border-2 border-primary bg-primary-soft text-primary"
             >
-              <span aria-hidden="true">♥</span>
+              <Icon name="heart" filled className="h-5 w-5" />
             </button>
           </li>
         ))}

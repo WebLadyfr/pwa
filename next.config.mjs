@@ -1,4 +1,7 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
+
+const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
 /** @type {import('next').NextConfig} */
 
@@ -20,6 +23,8 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  // Version affichée dans Réglages > À propos (valeur publique, non secrète).
+  env: { NEXT_PUBLIC_APP_VERSION: pkg.version },
   poweredByHeader: false, // ne pas annoncer la techno
   reactStrictMode: true,
   webpack(config) {

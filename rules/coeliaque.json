@@ -1,0 +1,186 @@
+{
+  "_comment": "PROFIL COELIAQUE - VERSION BROUILLON, NON VALIDÉ médicalement. À relire par un professionnel de santé (médecin, diététicien-nutritionniste) avant tout lancement. Même format que hashimoto.json ; les règles de même id que dans d'autres profils sont fusionnées au plus strict.",
+  "profile": "coeliaque",
+  "version": "0.1.0-draft",
+  "validation": {
+    "status": "DRAFT",
+    "validatedBy": null,
+    "validatedOn": null
+  },
+  "scoring": {
+    "base": 50,
+    "min": 0,
+    "max": 100,
+    "_thresholds": "score >= green => vert ; >= orange => orange ; sinon rouge.",
+    "thresholds": {
+      "green": 65,
+      "orange": 40
+    },
+    "_caps": "Plafond du cumul des bonus, pour qu'un produit très mauvais par ailleurs ne soit pas 'sauvé' par quelques points positifs.",
+    "caps": {
+      "maxBonus": 30
+    }
+  },
+  "dataRequirements": {
+    "_comment": "En dessous de ce nombre d'ingrédients normalisés (et sans additifs), on affiche 'données insuffisantes' plutôt qu'un score inventé.",
+    "minIngredientTags": 1
+  },
+  "rules": [
+    {
+      "id": "gluten",
+      "category": "strong_malus",
+      "points": -45,
+      "severity": "negative",
+      "reasonKey": "reason.gluten",
+      "match": {
+        "ingredients": [
+          "en:wheat",
+          "en:barley",
+          "en:rye",
+          "en:spelt",
+          "en:kamut",
+          "en:triticale",
+          "en:durum-wheat",
+          "en:semolina",
+          "en:gluten",
+          "en:wheat-gluten",
+          "en:malt",
+          "en:barley-malt"
+        ],
+        "allergens": [
+          "en:gluten"
+        ]
+      },
+      "forceMaxLevel": "red"
+    },
+    {
+      "id": "gluten_traces",
+      "category": "alert",
+      "points": -20,
+      "severity": "warning",
+      "reasonKey": "reason.gluten_traces",
+      "match": {
+        "traces": [
+          "en:gluten"
+        ]
+      },
+      "forceMaxLevel": "orange"
+    },
+    {
+      "id": "oats",
+      "category": "alert",
+      "points": -8,
+      "severity": "warning",
+      "reasonKey": "reason.oats",
+      "match": {
+        "ingredients": [
+          "en:oat",
+          "en:oats",
+          "en:oat-flakes",
+          "en:rolled-oats",
+          "en:oat-flour"
+        ]
+      }
+    },
+    {
+      "id": "gluten_free_label",
+      "category": "bonus",
+      "points": 10,
+      "severity": "positive",
+      "reasonKey": "reason.gluten_free_label",
+      "match": {
+        "labels": [
+          "en:no-gluten",
+          "en:gluten-free"
+        ]
+      }
+    },
+    {
+      "id": "added_sugars",
+      "category": "strong_malus",
+      "points": -20,
+      "severity": "negative",
+      "reasonKey": "reason.added_sugars",
+      "match": {
+        "ingredients": [
+          "en:sugar",
+          "en:cane-sugar",
+          "en:brown-sugar",
+          "en:icing-sugar",
+          "en:glucose-syrup",
+          "en:glucose-fructose-syrup",
+          "en:corn-syrup",
+          "en:fructose",
+          "en:dextrose",
+          "en:invert-sugar",
+          "en:caramel",
+          "en:syrup"
+        ]
+      }
+    },
+    {
+      "id": "ultra_processed",
+      "category": "medium_malus",
+      "points": -12,
+      "severity": "negative",
+      "reasonKey": "reason.ultra_processed",
+      "match": {
+        "nova": [
+          4
+        ]
+      }
+    },
+    {
+      "id": "fiber",
+      "category": "bonus",
+      "points": 6,
+      "severity": "positive",
+      "reasonKey": "reason.fiber",
+      "match": {
+        "nutriments": [
+          {
+            "key": "fiber_100g",
+            "op": "gte",
+            "value": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "minimally_processed",
+      "category": "bonus",
+      "points": 15,
+      "severity": "positive",
+      "reasonKey": "reason.minimally_processed",
+      "match": {
+        "nova": [
+          1
+        ]
+      }
+    },
+    {
+      "id": "allergens_declared",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.allergens_declared",
+      "match": {
+        "allergens": [
+          "*"
+        ]
+      }
+    },
+    {
+      "id": "traces_declared",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.traces_declared",
+      "match": {
+        "traces": [
+          "*"
+        ]
+      }
+    }
+  ]
+}

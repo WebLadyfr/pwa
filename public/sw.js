@@ -1,12 +1,20 @@
 /* Service worker : coquille d'app hors-ligne.
  * RÈGLES DE CONFIDENTIALITÉ : jamais de cache pour /api/* (produits, photos d'étiquettes),
  * aucune donnée utilisateur n'est mise en cache. */
-const CACHE = "hs-shell-v2";
+const CACHE = "hs-shell-v4";
 const PRECACHE = ["/offline.html", "/theme-init.js", "/icons/icon-192.png"];
-const CACHEABLE_PAGES = new Set(["/", "/search", "/label", "/favorites", "/history", "/settings", "/onboarding", "/privacy", "/terms", "/legal"]);
+// Pages légales : mises en cache dès l'installation (lisibles hors ligne même si jamais ouvertes).
+const LEGAL_PAGES = ["/legal/mentions", "/legal/cgu", "/legal/confidentialite", "/legal/avertissement", "/legal/licences"];
+const CACHEABLE_PAGES = new Set(["/", "/search", "/label", "/favorites", "/fridge", "/recipes", "/history", "/settings", "/onboarding", "/privacy", "/terms", "/legal", ...LEGAL_PAGES]);
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(CACHE).then(async (c) => {
+      await c.addAll(PRECACHE);
+      // Au mieux : un échec réseau ne doit pas empêcher l'installation.
+      await Promise.allSettled(LEGAL_PAGES.map((u) => c.add(u)));
+    }).then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener("activate", (e) => {

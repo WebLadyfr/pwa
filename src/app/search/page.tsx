@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { t } from "@/i18n";
@@ -6,6 +7,9 @@ import { searchByName, type SearchOutcome } from "@/lib/client";
 import { getActiveRuleSet } from "@/lib/ruleset";
 import { evaluate } from "@/lib/score/engine";
 import { normalizeQuery } from "@/lib/search-input";
+import { takePendingSearch } from "@/lib/search-handoff";
+import { veggieStatus } from "@/lib/veggie";
+import { halalStatus } from "@/lib/halal";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { MiniScore } from "@/components/MiniScore";
 import { StateMessage } from "@/components/StateMessage";
@@ -22,6 +26,12 @@ export default function SearchPage() {
   const [state, setState] = useState<"idle" | "loading" | SearchOutcome>("idle");
   const check = useMemo(() => normalizeQuery(input), [input]);
   const ruleSet = useMemo(() => getActiveRuleSet(), []);
+
+  // Terme venu de la barre de recherche de l'accueil (transmis en mémoire, jamais dans l'URL).
+  useEffect(() => {
+    const pending = takePendingSearch();
+    if (pending) setInput(pending);
+  }, []);
 
   useEffect(() => {
     if (!check.ok) {
@@ -84,6 +94,8 @@ export default function SearchPage() {
 }
 
 function ResultRow({ p, score }: { p: NormalizedProduct; score: ReturnType<typeof evaluate> }) {
+  const veg = veggieStatus(p).status;
+  const hal = halalStatus(p).status;
   return (
     <li className="flex items-center gap-2 rounded-xl bg-surface p-2 shadow-sm">
       <Link href={`/product/${p.code}`} className="flex min-h-14 min-w-0 flex-1 items-center gap-3 p-1">
@@ -96,6 +108,8 @@ function ResultRow({ p, score }: { p: NormalizedProduct; score: ReturnType<typeo
         <span className="min-w-0 flex-1">
           <span className="block font-medium">{p.name}</span>
           {p.brands && <span className="block text-sm text-muted">{p.brands}</span>}
+          {veg !== "unknown" && <span className="block text-sm text-muted"><Icon name={veg === "vegan" ? "leaf" : veg === "vegetarian" ? "egg" : "meat"} className="me-1 h-4 w-4 align-[-0.15em]" />{t(`veggie.badge.${veg}`)}</span>}
+          {hal !== "unknown" && <span className="block text-sm text-muted"><Icon name={hal === "not_halal" ? "x-circle" : hal === "check" ? "alert" : "shield"} className="me-1 h-4 w-4 align-[-0.15em]" />{t(`halal.badge.${hal}`)}</span>}
         </span>
         {score.status === "scored" ? <MiniScore score={score.score} level={score.level} /> : <MiniScore score={null} level={null} />}
       </Link>

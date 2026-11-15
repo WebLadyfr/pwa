@@ -3,6 +3,7 @@
   "regions": ["cdg1"],
   "functions": {
     "src/app/api/label/route.ts": { "maxDuration": 30 },
+    "src/app/api/recipes/route.ts": { "maxDuration": 60 },
     "src/app/api/**/route.ts": { "maxDuration": 15 }
   }
 }

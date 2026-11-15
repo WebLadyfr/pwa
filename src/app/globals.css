@@ -9,16 +9,20 @@
  * si vous changez une valeur, relancez `npm test`. Les trois blocs sombres doivent rester identiques.
  */
 :root {
-  --canvas: #f4f8f7;
+  --canvas: #f6f8f2;
   --surface: #ffffff;
-  --ink: #1f2933;
-  --muted: #3e4c59;
-  --line: #cbd2d9;
-  --line-strong: #616e7c;
-  --primary: #255a54;
+  --ink: #2a2118;
+  --muted: #56445d;
+  --line: #d6d9cc;
+  --line-strong: #6b6f5f;
+  --primary: #376f1d;
   --on-primary: #ffffff;
-  --primary-hover: #2f6f68;
-  --primary-soft: #e3eeec;
+  --primary-hover: #2c5917;
+  --primary-soft: #e6f0de;
+  --accent: #64ab44;
+  --brand: #563117;
+  --footer-bg: #56445d;
+  --footer-fg: #ffffff;
   --ok-bg: #e4f4e8;
   --ok-fg: #14532d;
   --ok-ring: #2e7d4f;
@@ -32,16 +36,20 @@
 }
 
 html[data-theme="dark"] {
-  --canvas: #0f1a19;
-  --surface: #172625;
-  --ink: #e6eeed;
-  --muted: #b7c4c2;
-  --line: #2c4140;
-  --line-strong: #7f9794;
-  --primary: #8fd6cc;
-  --on-primary: #0b1d1b;
-  --primary-hover: #a8e2da;
-  --primary-soft: #1f3836;
+  --canvas: #12190f;
+  --surface: #1b2518;
+  --ink: #eef2ea;
+  --muted: #d2c6d8;
+  --line: #34422e;
+  --line-strong: #8a9a82;
+  --primary: #8fcf6e;
+  --on-primary: #10200a;
+  --primary-hover: #a8dc8d;
+  --primary-soft: #26351f;
+  --accent: #64ab44;
+  --brand: #e0c2a6;
+  --footer-bg: #56445d;
+  --footer-fg: #ffffff;
   --ok-bg: #123524;
   --ok-fg: #b7f0cb;
   --ok-ring: #4cc380;
@@ -56,16 +64,20 @@ html[data-theme="dark"] {
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) {
-    --canvas: #0f1a19;
-    --surface: #172625;
-    --ink: #e6eeed;
-    --muted: #b7c4c2;
-    --line: #2c4140;
-    --line-strong: #7f9794;
-    --primary: #8fd6cc;
-    --on-primary: #0b1d1b;
-    --primary-hover: #a8e2da;
-    --primary-soft: #1f3836;
+    --canvas: #12190f;
+    --surface: #1b2518;
+    --ink: #eef2ea;
+    --muted: #d2c6d8;
+    --line: #34422e;
+    --line-strong: #8a9a82;
+    --primary: #8fcf6e;
+    --on-primary: #10200a;
+    --primary-hover: #a8dc8d;
+    --primary-soft: #26351f;
+    --accent: #64ab44;
+    --brand: #e0c2a6;
+    --footer-bg: #56445d;
+    --footer-fg: #ffffff;
     --ok-bg: #123524;
     --ok-fg: #b7f0cb;
     --ok-ring: #4cc380;
@@ -80,11 +92,11 @@ html[data-theme="dark"] {
 }
 
 /* Taille du texte : tout le design est en rem, donc tout suit. Pourcentages de la taille du navigateur. */
-html { font-size: 112.5%; }
-html[data-text="small"] { font-size: 100%; }
-html[data-text="normal"] { font-size: 112.5%; }
-html[data-text="large"] { font-size: 131.25%; }
-html[data-text="xlarge"] { font-size: 150%; }
+html { font-size: 100%; }
+html[data-text="small"] { font-size: 87.5%; }
+html[data-text="normal"] { font-size: 100%; }
+html[data-text="large"] { font-size: 118.75%; }
+html[data-text="xlarge"] { font-size: 137.5%; }
 
 @layer base {
   body { @apply bg-canvas text-ink antialiased; overflow-wrap: anywhere; }
@@ -92,13 +104,24 @@ html[data-text="xlarge"] { font-size: 150%; }
 }
 
 @layer components {
-  /* Cibles tactiles >= 3rem, contraste >= 4.5:1 */
-  .btn-primary { @apply inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-5 py-3 text-center text-lg font-semibold text-on-primary; }
+  /* Cibles tactiles >= 2,75rem (44 px au réglage normal), contraste >= 4.5:1 */
+  .btn-primary { @apply mx-auto inline-flex min-h-10 w-full max-w-[15rem] items-center justify-center gap-1.5 rounded-[2rem] bg-primary px-6 py-1.5 text-center text-sm font-semibold text-on-primary; }
   .btn-primary:hover { @apply bg-primary-hover; }
-  .btn-secondary { @apply inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-primary bg-surface px-5 py-3 text-center text-lg font-semibold text-primary; }
+  .btn-secondary { @apply mx-auto inline-flex min-h-10 w-full max-w-[15rem] items-center justify-center gap-1.5 rounded-[2rem] border-2 border-primary bg-surface px-5 py-1.5 text-center text-sm font-semibold text-primary; }
   .btn-secondary:hover { @apply bg-primary-soft; }
   .btn-secondary:disabled { @apply cursor-not-allowed opacity-50; }
   .h-18 { height: 4.5rem; } .w-18 { width: 4.5rem; }
+
+  /* Effet d'appui : le bouton « s'enfonce » légèrement (et le téléphone vibre brièvement, voir PressFeedback). */
+  .press, .btn-primary, .btn-secondary, button {
+    transition: transform 120ms ease-out, background-color 120ms ease-out, box-shadow 120ms ease-out;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .press:active, .btn-primary:active:not(:disabled), .btn-secondary:active:not(:disabled), button:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+  .btn-primary:active:not(:disabled) { @apply bg-primary-hover; }
+  .btn-secondary:active:not(:disabled) { @apply bg-primary-soft; }
 }
 
 @media (prefers-reduced-motion: reduce) {

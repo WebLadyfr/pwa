@@ -3,16 +3,15 @@ import { isValidGtin } from "@/lib/barcode";
 import { lookupProduct, searchCandidates } from "@/lib/server/off";
 import { jsonError } from "@/lib/server/http";
 import { clientIp, intFromEnv, rateLimit } from "@/lib/server/rate-limit";
-import { evaluate } from "@/lib/score/engine";
-import { defaultRuleSet } from "@rules/index";
 
 export const runtime = "nodejs";
 
 /**
- * Alternative : même catégorie OFF la plus spécifique, candidats scorés par LE MÊME moteur,
- * on ne propose que si le gain est net (>= 15 points) et le niveau meilleur.
+ * Candidats d'alternative : produits de la même catégorie OFF la plus spécifique (les plus scannés).
+ * Le SERVEUR NE SCORE PAS : il ne connaît pas le profil de la personne (jamais envoyé). Le navigateur note les candidats
+ * avec SES règles (profils cumulés, régime) et ne propose que si le gain est net.
  */
-const MIN_GAIN = 15;
+const MAX_CANDIDATES = 24;
 
 export async function GET(req: Request, ctx: { params: Promise<{ code: string }> }) {
   const { code } = await ctx.params;
@@ -21,23 +20,13 @@ export async function GET(req: Request, ctx: { params: Promise<{ code: string }>
   if (!rl.ok) return jsonError(429, "rate_limited", { "Retry-After": String(rl.retryAfterSec) });
 
   const src = await lookupProduct(code);
-  if (src.kind !== "ok") return NextResponse.json({ alternative: null });
-  const current = evaluate(src.product, defaultRuleSet);
+  if (src.kind !== "ok") return NextResponse.json({ candidates: [] });
   const category = src.product.categoriesTags.at(-1);
-  if (current.status !== "scored" || !category) return NextResponse.json({ alternative: null });
+  if (!category) return NextResponse.json({ candidates: [] });
 
-  const candidates = await searchCandidates(category);
-  let best: { product: (typeof candidates)[number]; score: number; level: string } | null = null;
-  for (const c of candidates) {
-    if (c.code === code || !c.name) continue;
-    const r = evaluate(c, defaultRuleSet);
-    if (r.status !== "scored") continue;
-    if (r.score >= current.score + MIN_GAIN && (!best || r.score > best.score)) {
-      best = { product: c, score: r.score, level: r.level };
-    }
-  }
+  const candidates = (await searchCandidates(category)).filter((c) => c.code && c.code !== code && c.name).slice(0, MAX_CANDIDATES);
   return NextResponse.json(
-    { alternative: best },
+    { candidates },
     { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } },
   );
 }

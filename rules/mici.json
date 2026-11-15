@@ -1,0 +1,253 @@
+{
+  "_comment": "PROFIL MICI - VERSION BROUILLON, NON VALIDÉ médicalement. À relire par un professionnel de santé (médecin, diététicien-nutritionniste) avant tout lancement. Même format que hashimoto.json ; les règles de même id que dans d'autres profils sont fusionnées au plus strict.",
+  "profile": "mici",
+  "version": "0.1.0-draft",
+  "validation": {
+    "status": "DRAFT",
+    "validatedBy": null,
+    "validatedOn": null
+  },
+  "scoring": {
+    "base": 50,
+    "min": 0,
+    "max": 100,
+    "_thresholds": "score >= green => vert ; >= orange => orange ; sinon rouge.",
+    "thresholds": {
+      "green": 65,
+      "orange": 40
+    },
+    "_caps": "Plafond du cumul des bonus, pour qu'un produit très mauvais par ailleurs ne soit pas 'sauvé' par quelques points positifs.",
+    "caps": {
+      "maxBonus": 30
+    }
+  },
+  "dataRequirements": {
+    "_comment": "En dessous de ce nombre d'ingrédients normalisés (et sans additifs), on affiche 'données insuffisantes' plutôt qu'un score inventé.",
+    "minIngredientTags": 1
+  },
+  "rules": [
+    {
+      "id": "emulsifiers",
+      "category": "medium_malus",
+      "points": -8,
+      "severity": "negative",
+      "reasonKey": "reason.emulsifiers",
+      "match": {
+        "additives": [
+          "en:e433",
+          "en:e435",
+          "en:e436",
+          "en:e466",
+          "en:e471",
+          "en:e472a",
+          "en:e472b",
+          "en:e472c",
+          "en:e472d",
+          "en:e472e",
+          "en:e472f",
+          "en:e473",
+          "en:e474",
+          "en:e475",
+          "en:e477",
+          "en:e481",
+          "en:e482",
+          "en:e491",
+          "en:e492",
+          "en:e493",
+          "en:e494",
+          "en:e495"
+        ]
+      }
+    },
+    {
+      "id": "thickeners",
+      "category": "medium_malus",
+      "points": -10,
+      "severity": "negative",
+      "reasonKey": "reason.thickeners",
+      "match": {
+        "additives": [
+          "en:e407",
+          "en:e407a",
+          "en:e466"
+        ]
+      }
+    },
+    {
+      "id": "polyols",
+      "category": "medium_malus",
+      "points": -10,
+      "severity": "negative",
+      "reasonKey": "reason.polyols",
+      "match": {
+        "additives": [
+          "en:e420",
+          "en:e421",
+          "en:e953",
+          "en:e964",
+          "en:e965",
+          "en:e966",
+          "en:e967",
+          "en:e968"
+        ]
+      }
+    },
+    {
+      "id": "sweeteners",
+      "category": "medium_malus",
+      "points": -10,
+      "severity": "negative",
+      "reasonKey": "reason.sweeteners",
+      "match": {
+        "additives": [
+          "en:e950",
+          "en:e951",
+          "en:e952",
+          "en:e953",
+          "en:e954",
+          "en:e955",
+          "en:e957",
+          "en:e959",
+          "en:e960",
+          "en:e961",
+          "en:e962",
+          "en:e965",
+          "en:e966",
+          "en:e967",
+          "en:e968",
+          "en:e969"
+        ],
+        "ingredients": [
+          "en:sweetener"
+        ]
+      }
+    },
+    {
+      "id": "ultra_processed",
+      "category": "medium_malus",
+      "points": -12,
+      "severity": "negative",
+      "reasonKey": "reason.ultra_processed",
+      "match": {
+        "nova": [
+          4
+        ]
+      }
+    },
+    {
+      "id": "added_sugars",
+      "category": "strong_malus",
+      "points": -20,
+      "severity": "negative",
+      "reasonKey": "reason.added_sugars",
+      "match": {
+        "ingredients": [
+          "en:sugar",
+          "en:cane-sugar",
+          "en:brown-sugar",
+          "en:icing-sugar",
+          "en:glucose-syrup",
+          "en:glucose-fructose-syrup",
+          "en:corn-syrup",
+          "en:fructose",
+          "en:dextrose",
+          "en:invert-sugar",
+          "en:caramel",
+          "en:syrup"
+        ]
+      }
+    },
+    {
+      "id": "dairy",
+      "category": "alert",
+      "points": -6,
+      "severity": "warning",
+      "reasonKey": "reason.dairy",
+      "match": {
+        "ingredients": [
+          "en:milk",
+          "en:lactose",
+          "en:milk-powder",
+          "en:skimmed-milk",
+          "en:skimmed-milk-powder",
+          "en:whey",
+          "en:cream"
+        ],
+        "allergens": [
+          "en:milk"
+        ]
+      }
+    },
+    {
+      "id": "high_fat",
+      "category": "medium_malus",
+      "points": -6,
+      "severity": "negative",
+      "reasonKey": "reason.high_fat",
+      "match": {
+        "nutriments": [
+          {
+            "key": "fat_100g",
+            "op": "gte",
+            "value": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "alcohol",
+      "category": "medium_malus",
+      "points": -10,
+      "severity": "negative",
+      "reasonKey": "reason.alcohol",
+      "match": {
+        "ingredients": [
+          "en:alcohol",
+          "en:wine",
+          "en:beer",
+          "en:spirit",
+          "en:rum",
+          "en:liquor",
+          "en:ethanol",
+          "en:cider"
+        ]
+      }
+    },
+    {
+      "id": "minimally_processed",
+      "category": "bonus",
+      "points": 15,
+      "severity": "positive",
+      "reasonKey": "reason.minimally_processed",
+      "match": {
+        "nova": [
+          1
+        ]
+      }
+    },
+    {
+      "id": "allergens_declared",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.allergens_declared",
+      "match": {
+        "allergens": [
+          "*"
+        ]
+      }
+    },
+    {
+      "id": "traces_declared",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.traces_declared",
+      "match": {
+        "traces": [
+          "*"
+        ]
+      }
+    }
+  ]
+}

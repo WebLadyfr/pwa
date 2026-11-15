@@ -1,4 +1,6 @@
 "use client";
+import { LEGAL_VERSION } from "../content/legal/version";
+import { DEFAULT_DIET, parseDietMode, type DietMode } from "./diet";
 import { computeFavorite, type Favorite, type FavoriteComputed } from "./favorites";
 import { normalizeProductShape } from "./sanitize";
 import type { Level, NormalizedProduct, RuleSet } from "./score/types";
@@ -19,11 +21,24 @@ const K_DISCLAIMER = `${P}disclaimer`;
 const K_PROFILE = `${P}profile`;
 const K_HISTORY = `${P}history`;
 const K_FAVORITES = `${P}favorites`;
+/** Visite guidée déjà vue (donnée technique, non sensible : écrite même sans consentement santé ; effacée avec le préfixe). */
+const K_TOUR = `${P}tour`;
+/** Recettes enregistrées + frigo : stockés sous le même préfixe (donc inclus dans « Supprimer toutes mes données »). */
+export const K_RECIPE_FAVORITES = `${P}recipe-favorites`;
+export const K_FRIDGE = `${P}fridge`;
+/** Régime (strict / en cours de test / souple), compteurs d'usage, statut des recettes, suivi des symptômes : données de santé -> même régime que le profil. */
+export const K_DIET = `${P}diet`;
+export const K_STATS = `${P}stats`;
+export const K_RECIPE_STATUS = `${P}recipe-status`;
+export const K_SYMPTOMS = `${P}symptoms`;
+export const STORAGE_PREFIX = P;
 
 /** À incrémenter dès que la politique de confidentialité ou le texte de consentement change : le consentement est redemandé. */
-export const POLICY_VERSION = "2026-11-draft-2";
+export const POLICY_VERSION = LEGAL_VERSION;
 /** À incrémenter si le texte du disclaimer change. */
 export const DISCLAIMER_VERSION = "1";
+/** À incrémenter si la visite guidée change assez pour être remontrée. */
+export const TOUR_VERSION = "1";
 export const DEFAULT_PROFILE_ID = "hashimoto";
 const MAX_HISTORY = 100;
 export const MAX_FAVORITES = 200;
@@ -95,7 +110,22 @@ export function needsOnboarding(): boolean {
   return !disclaimerAccepted() || consentStatus() === "unknown";
 }
 
-let sessionProfile: string | null = null; // profil « en session » quand rien n'est sauvegardé (mémoire uniquement)
+/* ------------------------------------------------------------------ visite guidée */
+
+export function tourSeen(): boolean {
+  return read<{ version?: string }>(K_TOUR)?.version === TOUR_VERSION;
+}
+export function markTourSeen(): void {
+  write(K_TOUR, { version: TOUR_VERSION, at: new Date().toISOString() });
+  notifyChange();
+}
+export function resetTour(): void {
+  remove(K_TOUR);
+  notifyChange();
+}
+
+let sessionProfiles: string[] | null = null; // profils « en session » quand rien n'est sauvegardé (mémoire uniquement)
+export const MAX_PROFILES = 12;
 const PROFILE_ID_RE = /^[a-z0-9_-]{1,32}$/;
 
 /**
@@ -103,16 +133,31 @@ const PROFILE_ID_RE = /^[a-z0-9_-]{1,32}$/;
  * granted=false : on n'écrit que le refus ; profil et données déjà présentes sont effacés,
  * le profil choisi n'existe plus qu'en mémoire (session).
  */
-export function setConsent(granted: boolean, profileId: string = getProfileId()): void {
-  const id = PROFILE_ID_RE.test(profileId) ? profileId : DEFAULT_PROFILE_ID;
+export function setConsent(granted: boolean, profiles: string | readonly string[] = getProfileIds()): void {
+  const ids = cleanProfileIds(profiles);
   write(K_CONSENT, { status: granted ? "granted" : "refused", at: new Date().toISOString(), policyVersion: POLICY_VERSION } satisfies ConsentRecord);
   if (granted) {
-    write(K_PROFILE, { id, createdAt: new Date().toISOString() });
-    sessionProfile = null;
+    write(K_PROFILE, { id: ids[0], ids, createdAt: new Date().toISOString() });
+    sessionProfiles = null;
   } else {
     purgeHealthData();
-    sessionProfile = id;
+    sessionProfiles = ids;
   }
+  notifyChange();
+}
+
+/** Identifiants valides, sans doublon, 1 à MAX_PROFILES ; à défaut le profil par défaut. */
+export function cleanProfileIds(profiles: string | readonly string[]): string[] {
+  const list = (typeof profiles === "string" ? [profiles] : [...profiles]).filter((x) => typeof x === "string" && PROFILE_ID_RE.test(x));
+  const ids = [...new Set(list)].slice(0, MAX_PROFILES);
+  return ids.length > 0 ? ids : [DEFAULT_PROFILE_ID];
+}
+
+/** Change les profils suivis (sans toucher au consentement). Sans accord d'enregistrement : valable pour la session seulement. */
+export function setProfileIds(profiles: readonly string[]): void {
+  const ids = cleanProfileIds(profiles);
+  if (consentStatus() === "granted") write(K_PROFILE, { id: ids[0], ids, createdAt: new Date().toISOString() });
+  else sessionProfiles = ids;
   notifyChange();
 }
 
@@ -120,14 +165,45 @@ function purgeHealthData(): void {
   remove(K_PROFILE);
   remove(K_HISTORY);
   remove(K_FAVORITES);
+  // Les recettes enregistrées découlent des règles du profil : même statut que les favoris. Le frigo suit (retrait = effacement).
+  remove(K_RECIPE_FAVORITES);
+  remove(K_FRIDGE);
+  // Régime, compteurs, statut des recettes et suivi des symptômes : mêmes règles.
+  remove(K_DIET);
+  remove(K_STATS);
+  remove(K_RECIPE_STATUS);
+  remove(K_SYMPTOMS);
 }
 
-export function getProfileId(): string {
+export function getProfileIds(): string[] {
   if (consentStatus() === "granted") {
-    const id = read<{ id?: string }>(K_PROFILE)?.id;
-    if (typeof id === "string" && PROFILE_ID_RE.test(id)) return id;
+    const rec = read<{ id?: unknown; ids?: unknown }>(K_PROFILE);
+    const raw = Array.isArray(rec?.ids) ? rec.ids : typeof rec?.id === "string" ? [rec.id] : [];
+    const ids = raw.filter((x): x is string => typeof x === "string" && PROFILE_ID_RE.test(x));
+    if (ids.length > 0) return cleanProfileIds(ids);
   }
-  return sessionProfile ?? DEFAULT_PROFILE_ID;
+  return sessionProfiles ?? [DEFAULT_PROFILE_ID];
+}
+
+/** Premier profil (compatibilité). */
+export function getProfileId(): string {
+  return getProfileIds()[0] ?? DEFAULT_PROFILE_ID;
+}
+
+/* ------------------------------------------------------------------ régime */
+
+let sessionDiet: DietMode | null = null; // sans accord d'enregistrement : valable pour la session seulement
+
+export function getDietMode(): DietMode {
+  if (consentStatus() === "granted") return parseDietMode(read<{ mode?: unknown }>(K_DIET)?.mode);
+  return sessionDiet ?? DEFAULT_DIET;
+}
+
+export function setDietMode(mode: DietMode): void {
+  const m = parseDietMode(mode);
+  if (consentStatus() === "granted") write(K_DIET, { mode: m, at: new Date().toISOString() });
+  else sessionDiet = m;
+  notifyChange();
 }
 
 /* ------------------------------------------------------------------ historique */
@@ -252,7 +328,8 @@ export async function deleteAllData(): Promise<void> {
   try {
     Object.keys(localStorage).filter((k) => k.startsWith(P)).forEach((k) => localStorage.removeItem(k));
   } catch { /* ignore */ }
-  sessionProfile = null;
+  sessionProfiles = null;
+  sessionDiet = null;
   deletedNotice = true;
   try {
     if ("caches" in window) await Promise.all((await caches.keys()).map((k) => caches.delete(k)));

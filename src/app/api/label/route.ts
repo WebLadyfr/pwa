@@ -41,6 +41,7 @@ export async function POST(req: Request) {
   bytes = new Uint8Array(0); // libère la référence : rien n'est conservé
 
   if (out.kind === "unreadable") return jsonError(422, "unreadable");
+  if (out.kind === "unavailable") return jsonError(503, "unavailable");
   if (out.kind === "error") return jsonError(502, "analysis_failed");
   return NextResponse.json({ product: out.product }, { headers: { "Cache-Control": "no-store" } });
 }

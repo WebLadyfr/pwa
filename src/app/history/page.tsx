@@ -1,10 +1,11 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { t } from "@/i18n";
+import { dateLocale, t } from "@/i18n";
 import { consentStatus, getHistory, type HistoryEntry } from "@/lib/storage";
 
-const ICON = { green: "✔", orange: "▲", red: "✖" } as const;
+const ICON = { green: "check", orange: "alert", red: "x-circle" } as const;
 const COLOR = { green: "text-ok-fg", orange: "text-warn-fg", red: "text-bad-fg" } as const;
 
 export default function HistoryPage() {
@@ -30,11 +31,11 @@ export default function HistoryPage() {
             <>
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-medium">{label}</span>
-                <span className="block text-sm text-muted">{new Date(e.at).toLocaleDateString("fr-FR")}</span>
+                <span className="block text-sm text-muted">{new Date(e.at).toLocaleDateString(dateLocale())}</span>
               </span>
               {e.level && e.score !== null ? (
                 <span className={`shrink-0 font-bold ${COLOR[e.level]}`}>
-                  <span aria-hidden="true">{ICON[e.level]} </span>
+                  <Icon name={ICON[e.level]} className="me-1 h-4 w-4 align-[-0.15em]" />
                   {e.score}/100 <span className="sr-only">{t(`level.${e.level}`)}</span>
                 </span>
               ) : (

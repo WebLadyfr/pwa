@@ -5,6 +5,7 @@ import { t } from "@/i18n";
 import { CHANGE_EVENT, needsOnboarding } from "@/lib/storage";
 import { Nav } from "./Nav";
 import { Onboarding } from "./Onboarding";
+import { Tour } from "./Tour";
 
 /** Pages lisibles sans onboarding (textes légaux) ou qui gèrent leur propre parcours. */
 const OPEN_PATHS = ["/privacy", "/terms", "/legal", "/onboarding"];
@@ -36,7 +37,7 @@ export function AppGate({ children }: { children: React.ReactNode }) {
     );
   }
   if (state === "checking") {
-    return <main id="main" className="flex-1 py-5"><p role="status" className="sr-only">{t("a11y.loading")}</p></main>;
+    return <main id="main" className="flex-1 py-5"><p role="status" suppressHydrationWarning className="sr-only">{t("a11y.loading")}</p></main>;
   }
   if (state === "need") {
     return (
@@ -49,6 +50,7 @@ export function AppGate({ children }: { children: React.ReactNode }) {
     <>
       <Nav />
       <main id="main" className="flex-1 py-5">{children}</main>
+      {path === "/" && <Tour />}
     </>
   );
 }

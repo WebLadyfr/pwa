@@ -1,0 +1,14 @@
+{
+  "_comment": "Allégations de santé interdites dans le texte d'une recette (titre, ingrédients, étapes, astuce). Toute recette qui en contient une est rejetée. À MAINTENIR par l'équipe (et le juriste). Comparaison sans accents ni casse, par MOTS ENTIERS. Une entrée finissant par * est un préfixe de mot (ex. « inflammat* » couvre inflammation, inflammatoire). Éviter les préfixes trop courts : « soign* » bloquerait « soigneusement ».",
+  "version": "1",
+  "terms": [
+    "guérit", "guérir", "guérison", "guérisseur", "soigne", "soigner", "soignent", "remède", "miracle", "miraculeux", "cure", "antidote", "détox*", "detox*", "purifi*", "dépuratif", "dépurer",
+    "inflammat*", "immun*", "défenses naturelles", "antioxydant*", "oxydant*", "anti-âge", "hormon*", "métabolisme*", "équilibre hormonal",
+    "thyroïd*", "thyroid*", "hashimoto", "diabèt*", "diabet*", "cancer*", "cholestérol*", "hypertension", "maladie*", "pathologi*", "symptôme*", "symptom*", "syndrome*",
+    "thérapeut*", "thérapie*", "médicament*", "médical*", "médecin*", "traitement médical", "posologie", "ordonnance",
+    "complément alimentaire", "compléments alimentaires", "supplément*", "supplement*", "gélule*", "vitamine d", "probiotique*", "prébiotique*",
+    "perte de poids", "maigrir", "minceur", "brûle graisse", "brûle-graisse", "brûler les graisses", "coupe-faim", "coupe faim",
+    "bon pour la santé", "bon pour la thyroïde", "bienfait*", "bénéfique*", "booste*", "booster", "boost", "facilite la digestion", "aide à digérer", "aide la digestion", "favorise la digestion", "régénère*", "revitalise*", "anti-inflammatoire*",
+    "heal*", "cures", "healing", "immune*", "inflammation", "anti-inflammatory", "medicine*", "weight loss", "fat burning"
+  ]
+}

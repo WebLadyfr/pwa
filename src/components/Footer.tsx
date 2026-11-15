@@ -1,10 +1,15 @@
-import Link from "next/link";
+"use client";
+import { useEffect, useState } from "react";
 import { t } from "@/i18n";
 
-/** Mentions obligatoires visibles sur toutes les pages. */
+/** Mentions obligatoires visibles sur toutes les pages, en pied de page (au-dessus du menu du bas). */
 export function Footer() {
+  // Rendu après montage : la langue choisie n'est connue que dans le navigateur.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return <footer className="mt-8 min-h-24" aria-hidden="true" />;
   return (
-    <footer className="space-y-3 border-t border-line py-6 text-sm text-muted">
+    <footer className="mt-8 space-y-3 rounded-3xl bg-footer px-5 py-6 text-sm text-footer-fg">
       <p role="note" className="font-medium">{t("disclaimer")}</p>
       <p>
         {t("attribution.prefix")}{" "}
@@ -13,11 +18,6 @@ export function Footer() {
         </a>{" "}
         {t("attribution.licence")}
       </p>
-      <ul className="flex flex-wrap gap-x-4 gap-y-1">
-        <li><Link href="/privacy" className="underline">{t("legal.privacy")}</Link></li>
-        <li><Link href="/terms" className="underline">{t("legal.terms")}</Link></li>
-        <li><Link href="/legal" className="underline">{t("legal.notice")}</Link></li>
-      </ul>
     </footer>
   );
 }

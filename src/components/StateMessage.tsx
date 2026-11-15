@@ -10,6 +10,7 @@ export function StateMessage({ kind, onRetry }: { kind: Exclude<FetchOutcome["ki
     upstream: { title: t("error.upstream.title"), body: t("error.upstream.body") },
     rate_limited: { title: t("error.generic.title"), body: t("error.rateLimited.body") },
     unreadable: { title: t("error.generic.title"), body: t("label.error.unreadable") },
+    label_unavailable: { title: t("label.error.unavailable.title"), body: t("label.error.unavailable.body") },
     invalid_image: { title: t("error.generic.title"), body: t("label.error.invalid") },
     error: { title: t("error.generic.title"), body: t("error.generic.body") },
   };
@@ -20,6 +21,7 @@ export function StateMessage({ kind, onRetry }: { kind: Exclude<FetchOutcome["ki
       <p>{m.body}</p>
       <div className="flex flex-col gap-3 sm:flex-row">
         {kind === "not_found" && <Link href="/label" className="btn-primary">{t("result.insufficient.cta")}</Link>}
+        {kind === "label_unavailable" && <Link href="/search" className="btn-primary">{t("home.search.go")}</Link>}
         {onRetry && kind !== "not_found" && <button type="button" onClick={onRetry} className="btn-primary">{t("error.retry")}</button>}
         <Link href="/" className="btn-secondary">{t("result.back")}</Link>
       </div>

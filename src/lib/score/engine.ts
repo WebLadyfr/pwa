@@ -69,6 +69,7 @@ export function evaluate(product: NormalizedProduct, rs: RuleSet): ScoreResult {
       reasonKey: rule.reasonKey,
       points: rule.points,
       items,
+      ...(rule.profiles ? { profiles: rule.profiles } : {}),
     });
     if (rule.forceMaxLevel && LEVEL_ORDER[rule.forceMaxLevel] < LEVEL_ORDER[maxLevel]) {
       maxLevel = rule.forceMaxLevel;

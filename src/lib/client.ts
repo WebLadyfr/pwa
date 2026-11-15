@@ -1,5 +1,6 @@
 import { normalizeProductShape } from "./sanitize";
-import type { NormalizedProduct } from "./score/types";
+import { evaluate } from "./score/engine";
+import type { NormalizedProduct, RuleSet } from "./score/types";
 
 export type FetchOutcome =
   | { kind: "ok"; product: NormalizedProduct }
@@ -8,6 +9,7 @@ export type FetchOutcome =
   | { kind: "rate_limited" }
   | { kind: "upstream" }
   | { kind: "unreadable" }
+  | { kind: "label_unavailable" }
   | { kind: "invalid_image" }
   | { kind: "error" };
 
@@ -34,15 +36,31 @@ export async function fetchProduct(code: string): Promise<FetchOutcome> {
   }
 }
 
-export async function fetchAlternative(code: string): Promise<{ name: string; brands: string | null; code: string; score: number } | null> {
+/** Gain minimal (points) pour proposer une alternative. */
+export const MIN_ALT_GAIN = 15;
+export interface Alternative { name: string; brands: string | null; code: string; score: number }
+
+/**
+ * Alternative : le serveur renvoie des candidats de la même catégorie, ILS SONT NOTÉS ICI avec les règles de la personne
+ * (profils cumulés et régime) : le profil ne quitte jamais l'appareil.
+ */
+export async function fetchAlternative(code: string, ruleSet: RuleSet, currentScore: number): Promise<Alternative | null> {
   try {
     const res = await fetch(`/api/alternatives/${encodeURIComponent(code)}`);
     if (!res.ok) return null;
-    const j = (await res.json()) as { alternative?: { product?: unknown; score?: unknown } | null };
-    const p = normalizeProductShape(j.alternative?.product);
-    const score = j.alternative?.score;
-    if (!p || !p.name || !p.code || typeof score !== "number") return null;
-    return { name: p.name, brands: p.brands, code: p.code, score: Math.round(score) };
+    const j = (await res.json()) as { candidates?: unknown };
+    if (!Array.isArray(j.candidates)) return null;
+    let best: (Alternative & { level: string }) | null = null;
+    for (const raw of j.candidates.slice(0, 24)) {
+      const p = normalizeProductShape(raw);
+      if (!p || !p.name || !p.code || p.code === code) continue;
+      const r = evaluate(p, ruleSet);
+      if (r.status !== "scored" || r.level === "red") continue;
+      if (r.score >= currentScore + MIN_ALT_GAIN && (!best || r.score > best.score)) {
+        best = { name: p.name, brands: p.brands, code: p.code, score: r.score, level: r.level };
+      }
+    }
+    return best ? { name: best.name, brands: best.brands, code: best.code, score: best.score } : null;
   } catch {
     return null;
   }
@@ -52,6 +70,10 @@ export async function sendLabelImage(blob: Blob): Promise<FetchOutcome> {
   if (typeof navigator !== "undefined" && !navigator.onLine) return { kind: "offline" };
   try {
     const res = await fetch("/api/label", { method: "POST", headers: { "Content-Type": blob.type }, body: blob });
+    // 503 = lecture de photos indisponible (service non configuré, budget du jour atteint) : message dédié.
+    if (res.status === 503) return { kind: "label_unavailable" };
+    // 502 = l'analyse a échoué (ce n'est PAS la base de produits qui est en cause) : message d'analyse générique.
+    if (res.status === 502) return { kind: "error" };
     return await handle(res);
   } catch {
     return { kind: "offline" };

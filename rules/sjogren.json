@@ -1,0 +1,163 @@
+{
+  "_comment": "PROFIL SJOGREN - VERSION BROUILLON, NON VALIDÉ médicalement. À relire par un professionnel de santé (médecin, diététicien-nutritionniste) avant tout lancement. Même format que hashimoto.json ; les règles de même id que dans d'autres profils sont fusionnées au plus strict.",
+  "profile": "sjogren",
+  "version": "0.1.0-draft",
+  "validation": {
+    "status": "DRAFT",
+    "validatedBy": null,
+    "validatedOn": null
+  },
+  "scoring": {
+    "base": 50,
+    "min": 0,
+    "max": 100,
+    "_thresholds": "score >= green => vert ; >= orange => orange ; sinon rouge.",
+    "thresholds": {
+      "green": 65,
+      "orange": 40
+    },
+    "_caps": "Plafond du cumul des bonus, pour qu'un produit très mauvais par ailleurs ne soit pas 'sauvé' par quelques points positifs.",
+    "caps": {
+      "maxBonus": 30
+    }
+  },
+  "dataRequirements": {
+    "_comment": "En dessous de ce nombre d'ingrédients normalisés (et sans additifs), on affiche 'données insuffisantes' plutôt qu'un score inventé.",
+    "minIngredientTags": 1
+  },
+  "rules": [
+    {
+      "id": "added_sugars",
+      "category": "strong_malus",
+      "points": -18,
+      "severity": "negative",
+      "reasonKey": "reason.added_sugars",
+      "match": {
+        "ingredients": [
+          "en:sugar",
+          "en:cane-sugar",
+          "en:brown-sugar",
+          "en:icing-sugar",
+          "en:glucose-syrup",
+          "en:glucose-fructose-syrup",
+          "en:corn-syrup",
+          "en:fructose",
+          "en:dextrose",
+          "en:invert-sugar",
+          "en:caramel",
+          "en:syrup"
+        ]
+      }
+    },
+    {
+      "id": "high_sugar_content",
+      "category": "medium_malus",
+      "points": -10,
+      "severity": "negative",
+      "reasonKey": "reason.high_sugar_content",
+      "match": {
+        "nutriments": [
+          {
+            "key": "sugars_100g",
+            "op": "gte",
+            "value": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "alcohol",
+      "category": "medium_malus",
+      "points": -10,
+      "severity": "negative",
+      "reasonKey": "reason.alcohol",
+      "match": {
+        "ingredients": [
+          "en:alcohol",
+          "en:wine",
+          "en:beer",
+          "en:spirit",
+          "en:rum",
+          "en:liquor",
+          "en:ethanol",
+          "en:cider"
+        ]
+      }
+    },
+    {
+      "id": "ultra_processed",
+      "category": "medium_malus",
+      "points": -12,
+      "severity": "negative",
+      "reasonKey": "reason.ultra_processed",
+      "match": {
+        "nova": [
+          4
+        ]
+      }
+    },
+    {
+      "id": "omega3",
+      "category": "bonus",
+      "points": 8,
+      "severity": "positive",
+      "reasonKey": "reason.omega3",
+      "match": {
+        "ingredients": [
+          "en:flaxseed",
+          "en:linseed",
+          "en:chia-seed",
+          "en:walnut",
+          "en:salmon",
+          "en:mackerel",
+          "en:sardine",
+          "en:herring",
+          "en:anchovy"
+        ],
+        "nutriments": [
+          {
+            "key": "omega-3-fat_100g",
+            "op": "gte",
+            "value": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "id": "minimally_processed",
+      "category": "bonus",
+      "points": 15,
+      "severity": "positive",
+      "reasonKey": "reason.minimally_processed",
+      "match": {
+        "nova": [
+          1
+        ]
+      }
+    },
+    {
+      "id": "allergens_declared",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.allergens_declared",
+      "match": {
+        "allergens": [
+          "*"
+        ]
+      }
+    },
+    {
+      "id": "traces_declared",
+      "category": "alert",
+      "points": 0,
+      "severity": "info",
+      "reasonKey": "reason.traces_declared",
+      "match": {
+        "traces": [
+          "*"
+        ]
+      }
+    }
+  ]
+}

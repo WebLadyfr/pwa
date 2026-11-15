@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
+import { LangSwitch } from "@/components/LangSwitch";
 import "./globals.css";
 import { RTL_LOCALES, defaultLocale, t } from "@/i18n";
 import { AppGate } from "@/components/AppGate";
 import { Footer } from "@/components/Footer";
 import { SwRegister } from "@/components/SwRegister";
 import { MonitoringInit } from "@/components/MonitoringInit";
+import { PressFeedback } from "@/components/PressFeedback";
 
 export const metadata: Metadata = {
   title: t("app.name"),
@@ -19,8 +21,8 @@ export const metadata: Metadata = {
 // Deux couleurs de barre système selon le thème de l'appareil.
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#255a54" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f1a19" },
+    { media: "(prefers-color-scheme: light)", color: "#376f1d" },
+    { media: "(prefers-color-scheme: dark)", color: "#12190f" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -37,16 +39,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script src="/theme-init.js" nonce={nonce} suppressHydrationWarning />
       </head>
       <body className="min-h-screen">
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:bg-surface focus:p-3">
+        <a href="#main" suppressHydrationWarning className="sr-only focus:not-sr-only focus:absolute focus:start-2 focus:top-2 focus:bg-surface focus:p-3">
           {t("a11y.skip")}
         </a>
-        <div className="mx-auto flex min-h-screen max-w-xl flex-col px-4">
-          <header className="py-4 text-2xl font-bold text-primary">{t("app.name")}</header>
+        <div className="mx-auto flex min-h-screen max-w-xl flex-col px-4 pb-28">
+          <header className="flex items-center justify-between gap-3 border-b-4 border-accent/60 py-3">
+            <span className="text-lg font-bold text-brand">{t("app.name")}</span>
+            <LangSwitch />
+          </header>
           <AppGate>{children}</AppGate>
           <Footer />
         </div>
         <SwRegister />
         <MonitoringInit />
+        <PressFeedback />
       </body>
     </html>
   );

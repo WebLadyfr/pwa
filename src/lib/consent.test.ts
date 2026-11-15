@@ -155,3 +155,28 @@ describe("préférences", () => {
     expect(parsePrefs({ theme: "rose", textSize: "gigantesque" })).toEqual({ theme: "auto", textSize: "normal", errorReports: false });
   });
 });
+
+
+import { getProfileIds, setProfileIds } from "./storage";
+
+describe("plusieurs profils", () => {
+  beforeEach(() => { acceptDisclaimer(); });
+  it("avec accord : les profils cochés sont gardés dans l'ordre, sans doublon ni identifiant invalide", () => {
+    setConsent(true, ["lupus", "hashimoto", "lupus", "../../etc"]);
+    expect(getProfileIds()).toEqual(["lupus", "hashimoto"]);
+    expect(getProfileId()).toBe("lupus");
+  });
+  it("modifier les profils sans toucher au consentement", () => {
+    setConsent(true, "hashimoto");
+    setProfileIds(["coeliaque", "psoriasis"]);
+    expect(getProfileIds()).toEqual(["coeliaque", "psoriasis"]);
+  });
+  it("sans accord : profils en mémoire de session seulement", () => {
+    setConsent(false, ["mici", "lupus"]);
+    expect(getProfileIds()).toEqual(["mici", "lupus"]);
+  });
+  it("liste vide : profil par défaut", () => {
+    setConsent(true, []);
+    expect(getProfileIds()).toEqual(["hashimoto"]);
+  });
+});

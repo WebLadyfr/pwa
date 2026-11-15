@@ -1,0 +1,9 @@
+{
+  "_comment": "Libellés NEUTRES envoyés au modèle pour chaque groupe d'exclusion (clé = id de règle de rules/*.json). Jamais le nom du profil ni du diagnostic. Un id absent d'ici reçoit un libellé générique dérivé du lexique.",
+  "gluten": "sans gluten",
+  "soy": "sans soja",
+  "added_sugars": "sans sucres ajoutés",
+  "sweeteners": "sans édulcorants",
+  "refined_oils": "sans huile de tournesol, de maïs, de soja, de coton ni de carthame (huile d'olive ou de colza possibles)",
+  "iodine_excess": "sans algues"
+}

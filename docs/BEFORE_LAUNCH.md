@@ -36,3 +36,10 @@
 - Sentry : créer le projet UE, DPA, « Prevent Storing of IP Addresses », rétention minimale, quotas ; test de bout en bout d'un rapport réel.
 - Test manuel à 150 % de taille de texte sur écran 320 px, en thème clair et sombre, avec lecteur d'écran (onboarding inclus).
 - Migration vers Next 16 (correctif des vulnérabilités du `postcss` embarqué), puis retest de la CSP, du middleware et du nonce.
+
+## 7. Recettes générées par IA (v0.3) à finaliser
+- Juriste : qualification de la **liste d'exclusions** envoyée à notre serveur et à Anthropic (peut révéler indirectement un régime), base légale et texte de l'écran de transparence ; compléter les `[À COMPLÉTER]` de la politique (rétention / non-entraînement chez Anthropic, transferts hors UE, DPA, région et DPA du magasin Redis, durées de conservation du cache et des compteurs).
+- Diététicien : relire `src/lib/recipes/lexicon.ts` (aliments rattachés aux tags des règles, règle « en cas de doute on rejette ») et la liste `health-claims.json` ; fournir des cas réels de recettes à rejeter/accepter.
+- Infra : créer le Redis (région UE), `RECIPES_IP_SALT`, variables Vercel ; brancher le même Redis sur les autres routes (rate limit actuellement en mémoire).
+- Produit : décider du quota gratuit (`RECIPE_FREE_MONTHLY_QUOTA`) et brancher le paiement sur `resolveMonthlyLimit()` sans lier d'identifiant au profil.
+- Mesurer en conditions réelles (taux de recettes rejetées, taux de « pas assez de recettes », latence, coût par génération) avant d'ouvrir à tous ; surveiller le journal de tokens.

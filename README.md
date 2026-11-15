@@ -1,4 +1,4 @@
-# Scan Hashimoto (MVP)
+# Immulea (MVP)
 
 PWA mobile-first : on scanne un code-barres, l'app affiche un score 🟢🟠🔴 et les raisons précises.
 **Information bien-être indicative. Ne remplace pas l'avis d'un professionnel de santé. Ne constitue ni un diagnostic ni un traitement.**
@@ -22,7 +22,8 @@ src/
     search-input.ts       Validation stricte du terme de recherche
     sentry-scrub.ts       Nettoyage (liste blanche) des rapports d'erreur ; monitoring.ts = init opt-in
     client.ts             Appels vers NOTRE backend, redimensionnement photo sans EXIF
-    server/               off.ts, label.ts (Claude), rate-limit.ts, http.ts  [server-only]
+    recipes/              Module de recettes : lexique, exclusions, revalidation, schéma zod, prompt, génération (purs, testés)
+    server/               off.ts, label.ts (Claude), rate-limit.ts, http.ts, kv.ts, recipes-service.ts, recipes-claude.ts  [server-only]
   app/
     page.tsx              Scan caméra + saisie manuelle
     onboarding/           Refaire l'accueil (3 écrans : bienvenue, profil, disclaimer + consentement)
@@ -35,7 +36,9 @@ src/
     api/product/[code]    Proxy Open Food Facts (User-Agent perso, cache)
     api/alternatives/[code]  Meilleure alternative de la même catégorie
     api/search            Recherche par nom (POST, terme jamais journalisé)
-    api/label             SEUL point d'accès à l'API Claude
+    api/label             Point d'accès à l'API Claude (lecture d'étiquette)
+    api/recipes           Point d'accès à l'API Claude (recettes) : même service pour scan et frigo
+    fridge/ recipes/      Mon frigo (liste locale) ; recettes enregistrées (hors-ligne)
 public/sw.js, offline.html, icons/   PWA
 ```
 
@@ -78,9 +81,26 @@ Voir `.env.example`. **Aucun secret n'est préfixé `NEXT_PUBLIC_`.** Seule exce
 | `LABEL_RATE_LIMIT_PER_10MIN`, `PRODUCT_RATE_LIMIT_PER_MIN` | Rate limits par IP |
 | `LABEL_DAILY_BUDGET` | Plafond quotidien d'appels Claude (garde-fou de coût) |
 | `SEARCH_RATE_LIMIT_PER_MIN` | Rate limit de la recherche par nom (par IP) |
+| `RECIPE_MODEL`, `RECIPE_MAX_TOKENS` | Modèle des recettes (défaut `claude-haiku-5-5`) et plafond de tokens de sortie (dur : 4000) |
+| `RECIPE_FREE_MONTHLY_QUOTA`, `RECIPES_RATE_LIMIT_PER_10MIN`, `RECIPES_DAILY_BUDGET`, `RECIPE_CACHE_TTL_SEC` | Quota gratuit mensuel, débit par IP, plafond global quotidien, durée du cache |
+| `UPSTASH_REDIS_REST_URL` / `_TOKEN` (ou `KV_REST_API_URL` / `_TOKEN`) | Redis partagé pour le rate limit, le quota et le cache des recettes. **Obligatoire en production** |
+| `RECIPES_IP_SALT` | Sel secret (≥ 16 car.) pour pseudonymiser les IP dans Redis. **Obligatoire en production** |
 | `NEXT_PUBLIC_SENTRY_DSN` | DSN Sentry **région UE** (optionnel). Non secret mais fixé au build ; vide = rapports d'erreur indisponibles |
 
-Sans `ANTHROPIC_API_KEY`, seule la fonction « photo d'étiquette » est indisponible (erreur générique).
+Sans `ANTHROPIC_API_KEY`, les fonctions « photo d'étiquette » et « recettes » sont indisponibles (erreur générique).
+Les recettes exigent en plus, **en production**, un Redis partagé et `RECIPES_IP_SALT` : sans eux la route répond « indisponible » plutôt que de tourner avec un plafond de coût contournable.
+
+## Recettes générées (scan → recettes, Mon frigo)
+
+Un seul module (`src/lib/recipes`) et une seule route (`/api/recipes`) pour les deux entrées.
+
+1. **Exclusions, pas de profil** : `deriveExclusions(règles)` transforme toute règle à malus portant sur des *ingrédients* en groupe d'exclusion (« gluten », « soy »…). Seule cette liste (ids de règle + tags d'ingrédients) quitte l'appareil : jamais le nom du profil ni le diagnostic ; le schéma de la requête est **strict** (un champ `profile` est refusé en 400). Cumuler des profils = union des exclusions, sans toucher au code.
+2. **Génération** : prompt système versionné côté serveur (`PROMPT_VERSION`), noms d'ingrédients nettoyés (liste blanche de caractères, longueur, rejet des formulations de consigne) puis passés comme **données JSON délimitées**. Sortie validée par zod ; réponse invalide → une seule nouvelle tentative.
+3. **Revalidation (la vraie garantie)** : chaque ingrédient, **et** le titre / les étapes / l'astuce, sont normalisés en tags par le lexique (`lexicon.ts`) puis évalués par le **même `evaluate()`** que le score, avec un jeu de règles synthétique issu des exclusions. Une recette contenant un ingrédient exclu, ou une allégation de santé (`config/health-claims.json`), n'est jamais affichée. < 2 recettes valides → une relance citant les aliments refusés (libellés canoniques du lexique, jamais du texte du modèle), sinon « pas assez de recettes compatibles ». La même revalidation est refaite **sur l'appareil** à la réception.
+4. **Coût / abus** : `max_tokens` plafonné, prompt système statique (cacheable), cache serveur « scan » (clé = code-barres + version des règles + langue + empreinte des exclusions + version du prompt, TTL configurable), rate limit et quota mensuel dans Redis (IP hachée avec sel), plafond global quotidien, échec fermé si Redis est injoignable. Le seul journal est un compteur de tokens par requête (sans contenu).
+5. **Paiement (étape suivante)** : `resolveMonthlyLimit()` dans `recipes-service.ts` est le point d'extension (quota gratuit → quota payant) ; le client lit la limite dans la réponse du serveur.
+
+**Maintenance** : le lexique est une donnée au même titre que `rules/*.json`. Tout nouveau profil dont les règles visent des tags absents du lexique doit y ajouter ses entrées (un test signale un groupe d'exclusion qu'aucune entrée ne couvre). Modifier le texte du prompt → incrémenter `PROMPT_VERSION`. Modifier le texte de l'écran de transparence → incrémenter `RECIPES_CONSENT_VERSION` (`src/lib/recipes/local.ts`).
 
 ## Déploiement Vercel (région UE)
 
@@ -101,7 +121,8 @@ Sans `ANTHROPIC_API_KEY`, seule la fonction « photo d'étiquette » est indispo
 
 ## Limites connues (MVP)
 
-- **Rate limiting par instance** : sur serverless, chaque instance a sa mémoire. Pour la prod : Upstash Redis / Vercel KV avec la même interface (`rate-limit.ts`).
+- **Rate limiting des routes produit / recherche / étiquette** : par instance (mémoire). Seule la route recettes utilise Redis ; pour les autres, brancher le même magasin (`kv.ts`) avant lancement.
+- **Recettes : couverture du lexique** : la revalidation repose sur des mots d'ingrédients connus (`lexicon.ts`). Un aliment absent du lexique n'est pas reconnu comme interdit. Principe retenu : en cas de doute, rejeter (« farine » = blé, « huile végétale » = tournesol).
 - **Alternatives** : dépend de l'endpoint de recherche d'Open Food Facts, qui est parfois indisponible (constaté pendant le développement) ; l'app affiche alors simplement « pas d'alternative ».
 - **Qualité des données OFF** : listes d'ingrédients parfois partielles → « données insuffisantes » plutôt qu'un score trompeur.
 - **CSP `style-src 'unsafe-inline'`** : seul compromis (styles React/Next) ; les scripts restent stricts (nonce + strict-dynamic).

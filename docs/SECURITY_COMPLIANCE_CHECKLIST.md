@@ -51,6 +51,20 @@ Légende : ✅ fait dans le code (vérifié pendant le développement) · ☐ à
 - ✅ Aucun terme de guérison / formulation médicale (relecture humaine à faire : mots comme « adapté » restent à valider).
 - ☐ ODbL : vérifier les obligations de partage à l'identique si vous redistribuez une base dérivée (l'historique local n'en est pas une, mais à confirmer).
 
+## Espace « Informations légales » (15 nov. 2026)
+- ✅ Cinq pages dédiées : `/legal/mentions`, `/legal/cgu`, `/legal/confidentialite`, `/legal/avertissement`, `/legal/licences` (contenu dans `src/content/legal/*.ts`, date de mise à jour et bandeau « à faire relire » en tête). Index : `/legal`. Anciennes adresses `/privacy` et `/terms` : redirigées.
+- ✅ Accès : Réglages > « À propos et informations légales » (5 pages + Contact + version de l'app) et pied de page de chaque écran.
+- ✅ Aucun lien externe dans les textes (tests) ; seul le lien `mailto:` du Contact sort de l'app.
+- ✅ Rappel court du disclaimer sous le score (avec « En savoir plus ») ; liens CGU et confidentialité dans la phrase de consentement.
+- ✅ Source unique du disclaimer : clés i18n `disclaimer` / `disclaimer.short`. Source unique de la version des textes : `LEGAL_VERSION` (= `POLICY_VERSION`) : la changer redemande le consentement à tous.
+- ✅ Pages légales mises en cache par le service worker dès l'installation (lisibles hors ligne).
+- ☐ **Remplir tous les `[À COMPLÉTER]`** des cinq fichiers de `src/content/legal/` (éditeur, SIRET, adresse, hébergeur, DPO, DPA Anthropic / Sentry, durées de rétention, droit applicable) puis faire relire par un juriste et retirer le bandeau `Draft`.
+- ☐ Renseigner `NEXT_PUBLIC_CONTACT_EMAIL` (sinon l'entrée « Contact » renvoie vers les mentions légales).
+- ☐ Générer la liste complète des licences des dépendances (directes et indirectes) avant lancement.
+- ☐ Quand les textes changent de façon substantielle : mettre à jour `LEGAL_VERSION` et `LEGAL_UPDATED` (`src/content/legal/version.ts`).
+- ⚠️ `npm audit --omit=dev` (15 nov. 2026) : toujours les 2 mêmes vulnérabilités (postcss embarqué par Next 15), aucune nouvelle.
+- ⚠️ Les pages légales sont prérendues par route mais servies dynamiquement : la CSP à nonce impose de lire les en-têtes dans le layout racine.
+
 ## Accessibilité (RGAA / WCAG 2.2 AA)
 - ✅ Couleur + icône + texte pour chaque niveau ; contrastes calculés ≥ 4.5:1 ; cibles ≥ 48 px ; focus visible ; `prefers-reduced-motion`.
 - ☐ Audit manuel : lecteur d'écran (TalkBack/VoiceOver), zoom 200 %, test daltonisme.
@@ -102,3 +116,59 @@ Légende : ✅ fait dans le code (vérifié pendant le développement) · ☐ à
 ## Dépendances (mise à jour)
 - ⚠️ Ajout de `@sentry/browser` (11.11) : **aucune nouvelle vulnérabilité** selon `npm audit --omit=dev`. Les 2 mêmes (via le `postcss` embarqué par Next 15, voir plus haut) subsistent.
 - ☐ Le DSN Sentry est la seule variable `NEXT_PUBLIC_*` : vérifier qu'aucun secret n'est jamais préfixé ainsi.
+
+---
+
+# Ajouts v0.3 (recettes générées par IA : scan → recettes, Mon frigo)
+
+Légende inchangée : ✅ fait et vérifié dans le code/les tests · ☐ à faire ou à vérifier par un humain · ⚠️ limite connue
+
+## Secrets et API
+- ✅ Appel à l'API Claude **uniquement** depuis `/api/recipes` (module `server-only`) ; grep de `.next/static` après build : aucune occurrence de `sk-ant`, `ANTHROPIC_API_KEY`, `api.anthropic.com`, `UPSTASH`, `RECIPES_IP_SALT`.
+- ✅ Corps de la requête vers Claude vérifié par test (payload réel capturé) : uniquement `model`, `max_tokens`, `thinking`, `output_config`, `system`, `messages`. Pas de `metadata.user_id`, aucun identifiant, aucun profil ni diagnostic. La clé n'est que dans l'en-tête.
+- ✅ Schéma de la requête **strict** (zod) : un champ `profile`, `diagnosis`, `userId`… est refusé en 400, y compris dans `exclusions`.
+- ☐ Nouvelle variable secrète `RECIPES_IP_SALT` (≥ 16 caractères aléatoires) et jetons Redis : à créer dans Vercel (*Sensitive*), jamais préfixés `NEXT_PUBLIC_`.
+- ☐ Clé Anthropic : plafond de dépense + alerte de coût (le garde-fou applicatif `RECIPES_DAILY_BUDGET` ne remplace pas celui du fournisseur).
+
+## Données de santé et vie privée
+- ✅ **Ce qui sort de l'appareil** : noms d'ingrédients (≤ 15), liste d'exclusions générique (ids de règle + tags d'ingrédients), langue, version des règles, code-barres (mode scan). **Jamais** le nom du profil ni le diagnostic (testé : requête client ET requête vers Claude).
+- ✅ Frigo, recettes enregistrées, quota local, accord IA : uniquement sur l'appareil, sous le préfixe `hs:v1:` → effacés par « Supprimer toutes mes données » (testé) ; le retrait de l'accord local efface frigo et recettes enregistrées (testé).
+- ✅ Écran de transparence + case à cocher **avant** le premier envoi (aucun appel réseau sans accord) ; accord retirable dans Réglages ; versionné (`RECIPES_CONSENT_VERSION`).
+- ✅ `POLICY_VERSION` incrémentée (`2026-11-draft-3`) : politique modifiée (nouveau destinataire hors UE) → l'onboarding est redemandé à tous.
+- ✅ Journal serveur : un seul événement par requête, uniquement des compteurs (tokens, nombre d'appels, issue). Vérifié par test : ni ingrédient, ni titre, ni IP, ni clé de cache.
+- ✅ IP : jamais stockée en clair ; HMAC-SHA256 salé (tronqué), durée de vie ≤ ~40 jours (compteur mensuel), 20 minutes (fenêtre de débit).
+- ⚠️ **La liste d'exclusions peut révéler indirectement un régime alimentaire** (ex. « sans gluten, sans soja, sans sucres ajoutés, sans algues »). Ce n'est pas le diagnostic, mais un juriste doit trancher si elle relève des données de santé (art. 9) et si l'accord actuel (art. 6.1.a) suffit.
+- ☐ Anthropic : DPA, **conditions de rétention / non-entraînement sur les données d'API**, ZDR possible ?, transferts hors UE (CCT / DPF) → à compléter dans la politique (`[À COMPLÉTER]` posés).
+- ☐ Magasin Redis (Upstash / Vercel KV) : choisir une **région UE**, DPA, chiffrement, durée de conservation ; le renseigner dans la politique.
+- ☐ Registre des traitements et AIPD : ajouter ce traitement.
+- ☐ Journaux de l'hébergeur : confirmer qu'ils ne contiennent pas le corps des requêtes `POST /api/recipes`.
+
+## Injection de prompt et sortie du modèle
+- ✅ Noms d'ingrédients (OFF ou saisie) : liste blanche de caractères, ≤ 50 caractères / 8 mots, rejet des formulations de consigne, transmis comme **données JSON délimitées** (`<donnees_ingredients>`), le prompt système ordonne de les traiter comme des données. Testé avec 8 charges d'injection ; les chevrons et guillemets ne peuvent pas fermer le bloc.
+- ⚠️ Le filtre « formulations de consigne » est une heuristique (couche parmi d'autres) : une consigne reformulée peut passer. La garantie ne repose pas sur lui mais sur la **revalidation** ci-dessous.
+- ✅ Le nom du produit scanné est retrouvé **par le serveur** à partir du code-barres : le client ne peut pas empoisonner le cache partagé avec un nom arbitraire.
+- ✅ Sortie validée par zod (types, bornes) puis assainie ; réponse invalide → **une seule** nouvelle tentative ; échec → message générique.
+- ✅ **Revalidation par le moteur de règles** (`evaluate()` inchangé, jeu de règles synthétique issu des exclusions) sur chaque ingrédient **et** sur le titre, les étapes, l'astuce ; une recette fautive n'est jamais affichée. Refaite **sur l'appareil** (un serveur compromis ne peut pas faire afficher une recette interdite : testé). Revalidation aussi à la sortie du cache serveur.
+- ✅ Filtre d'allégations de santé (`src/lib/recipes/config/health-claims.json`) appliqué à tout le texte. Observé en réel : la revalidation a rejeté au moins une recette sur les 24 générées pendant les mesures.
+- ⚠️ **Couverture du lexique** (`lexicon.ts`) : un aliment absent du lexique n'est pas reconnu comme exclu ; principe « en cas de doute on rejette » (farine = blé, huile végétale = tournesol, produits sucrés courants), mais aucune liste n'est exhaustive. À faire relire par un diététicien et à enrichir avec des cas réels.
+- ☐ Faire relire la liste d'allégations de santé par un juriste (et l'enrichir : elle est volontairement prudente mais non exhaustive).
+- ☐ Test manuel adversarial : saisir dans « Mon frigo » des noms piégés et vérifier qu'aucune recette interdite ne s'affiche.
+
+## Coûts et abus
+- ✅ `max_tokens` plafonné (défaut 2500, plafond dur 4000) ; prompt système court et statique (cache fournisseur vérifié en réel : 577 tokens lus en cache par appel) ; **réflexion du modèle désactivée** (sinon elle consommait `max_tokens` et coupait le JSON : constaté en réel, 4 réponses sur 5).
+- ✅ Rate limit **distribué** (Redis), par IP hachée : 6 requêtes / 10 min (`RECIPES_RATE_LIMIT_PER_10MIN`) ; quota gratuit mensuel configurable (défaut 10) avec compteur local + contrôle serveur ; plafond global quotidien (`RECIPES_DAILY_BUDGET`).
+- ✅ **Échec fermé** : si Redis est injoignable, la route répond « indisponible » sans appeler le modèle ; en production sans Redis ni sel d'IP, la fonction est désactivée (testé).
+- ✅ Cache serveur du mode scan (code-barres + version des règles + langue + empreinte des exclusions + version du prompt), TTL configurable, sans donnée personnelle ; les « cache hits » ne consomment ni quota ni tokens.
+- ✅ Les générations qui échouent ou ne livrent rien ne consomment pas le quota.
+- ✅ Mode dégradé : quota, limite de débit, indisponibilité, hors ligne, produit introuvable → messages clairs, jamais d'erreur technique.
+- ⚠️ Rate limit et quota **par IP** : des utilisatrices derrière une même IP (réseau mobile partagé) se partagent le quota ; une personne peut le contourner en changeant d'IP. Le plafond global quotidien et le plafond de dépense du fournisseur limitent l'exposition. Le paiement (étape suivante) devra porter un droit sans lien avec le profil.
+- ⚠️ Fenêtre fixe de 10 minutes (pas glissante) : une rafale à cheval sur deux fenêtres peut doubler brièvement la limite.
+- ☐ Les autres routes (`/api/label`, `/api/product`, `/api/search`) gardent le rate limit **en mémoire** : brancher le même magasin Redis avant lancement.
+- ☐ Test de charge / abus sur `/api/recipes` ; alerte de coût Anthropic.
+
+## Accessibilité
+- ✅ Boutons ≥ 48 px, `aria-pressed` / `aria-label` sur les cœurs, `role="status"` / `role="alert"` pour chargement et erreurs, focus déplacé sur le résultat, cases à cocher libellées, couleurs via jetons (clair/sombre), icône + texte (jamais la couleur seule). Disclaimer visible sur chaque carte.
+- ☐ Audit manuel : lecteur d'écran sur le parcours frigo → génération → favori ; 150 % de texte à 320 px, thème sombre.
+
+## Dépendances
+- ✅ `zod` 4.6.7 ajouté (seule nouvelle dépendance de production). `npm audit --omit=dev` : **2 vulnérabilités (1 modérée, 1 haute), identiques à avant l'ajout** (postcss embarqué par Next 15, voir plus haut) : aucune nouveauté.

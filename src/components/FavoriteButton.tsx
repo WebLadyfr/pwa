@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { t } from "@/i18n";
@@ -39,9 +40,9 @@ export function FavoriteButton({ product, compact = false }: { product: Normaliz
         aria-pressed={fav}
         aria-label={label}
         title={label}
-        className={`inline-flex min-h-12 min-w-12 items-center justify-center rounded-xl border-2 border-primary text-2xl text-primary ${fav ? "bg-primary-soft" : "bg-surface"}`}
+        className={`inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border-2 border-primary text-primary ${fav ? "bg-primary-soft" : "bg-surface"}`}
       >
-        <span aria-hidden="true">{fav ? "♥" : "♡"}</span>
+        <Icon name="heart" filled={fav} className="h-5 w-5" />
       </button>
       {denied && (
         <p role="alert" className="text-sm text-warn-fg">

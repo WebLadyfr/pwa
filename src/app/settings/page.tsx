@@ -1,38 +1,56 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { t } from "@/i18n";
+import { Modal } from "@/components/Modal";
+import { dateLocale, t } from "@/i18n";
 import { monitoringAvailable } from "@/lib/monitoring";
 import { DEFAULT_PREFS, TEXT_SIZES, THEMES, getPrefs, setPrefs, type Prefs } from "@/lib/prefs";
-import { deleteAllData, getConsent, getProfileId, setConsent, type ConsentRecord } from "@/lib/storage";
+import { hasRecipeConsent, withdrawRecipeConsent } from "@/lib/recipes/local";
+import { PROFILES } from "@rules/index";
+import { LangSwitch } from "@/components/LangSwitch";
+import { ProfilePicker } from "@/components/ProfilePicker";
+import { LegalMenu } from "@/components/LegalMenu";
+import { deleteAllData, getConsent, getProfileIds, resetTour, setConsent, setProfileIds, type ConsentRecord } from "@/lib/storage";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [consent, setConsentState] = useState<ConsentRecord | null>(null);
   const [prefs, setPrefsState] = useState<Prefs>(DEFAULT_PREFS);
-  const [profile, setProfile] = useState("hashimoto");
+  const [profiles, setProfiles] = useState<string[]>(["hashimoto"]);
   const [errorsAvailable, setErrorsAvailable] = useState(false);
+  const [aiConsent, setAiConsent] = useState(false);
 
   useEffect(() => {
     setConsentState(getConsent());
     setPrefsState(getPrefs());
-    setProfile(getProfileId());
+    setProfiles(getProfileIds());
     setErrorsAvailable(monitoringAvailable());
+    setAiConsent(hasRecipeConsent());
   }, []);
 
   const change = (granted: boolean) => {
-    setConsent(granted, profile);
+    setConsent(granted, profiles);
     setConsentState(getConsent());
+  };
+  const toggleProfile = (id: string) => {
+    const next = profiles.includes(id) ? profiles.filter((x) => x !== id) : [...profiles, id];
+    if (next.length === 0) return; // au moins un profil
+    setProfiles(next);
+    setProfileIds(next);
   };
   const update = (patch: Partial<Prefs>) => setPrefsState(setPrefs(patch));
 
+  const [confirmWipe, setConfirmWipe] = useState(false);
   const wipe = async () => {
-    if (!window.confirm(t("settings.delete.confirm"))) return;
+    setConfirmWipe(false);
     await deleteAllData(); // l'événement de changement ramène à l'onboarding (qui affiche la confirmation)
   };
 
   const status =
     consent?.status === "granted"
-      ? t("settings.consent.granted", { date: new Date(consent.at).toLocaleDateString("fr-FR") })
+      ? t("settings.consent.granted", { date: new Date(consent.at).toLocaleDateString(dateLocale()) })
       : consent?.status === "refused"
         ? t("settings.consent.refused")
         : t("settings.consent.unknown");
@@ -43,7 +61,8 @@ export default function SettingsPage() {
 
       <section aria-labelledby="s-consent" className="space-y-3">
         <h2 id="s-consent" className="text-lg font-semibold">{t("settings.consent")}</h2>
-        <p>{t("settings.profile")} : <strong>{t(`profile.${profile}`)}</strong></p>
+        <ProfilePicker ids={Object.keys(PROFILES)} selected={profiles} onToggle={toggleProfile} label={t("settings.profile")} />
+        <p className="text-sm text-muted">{t("settings.profile.help")}</p>
         <p aria-live="polite">{status}</p>
         {consent?.status === "granted" ? (
           <button type="button" className="btn-secondary" onClick={() => change(false)}>{t("settings.consent.withdraw")}</button>
@@ -52,10 +71,16 @@ export default function SettingsPage() {
         )}
         <p className="text-sm text-muted">{t("consent.body")}</p>
         <Link href="/onboarding" className="btn-secondary">{t("settings.onboarding.redo")}</Link>
+        <button type="button" className="btn-secondary" onClick={() => { resetTour(); router.push("/"); }}>{t("settings.tour.redo")}</button>
       </section>
 
       <section aria-labelledby="s-display" className="space-y-5">
         <h2 id="s-display" className="text-lg font-semibold">{t("settings.display")}</h2>
+
+        <div className="space-y-2">
+          <p className="font-medium">{t("lang.title")}</p>
+          <LangSwitch variant="list" />
+        </div>
 
         <fieldset className="space-y-2">
           <legend className="mb-1 font-medium">{t("settings.theme")}</legend>
@@ -100,21 +125,41 @@ export default function SettingsPage() {
         </p>
       </section>
 
+      <section aria-labelledby="s-recipes" className="space-y-3">
+        <h2 id="s-recipes" className="text-lg font-semibold">{t("settings.recipes")}</h2>
+        <p aria-live="polite">{aiConsent ? t("settings.recipes.on") : t("settings.recipes.off")}</p>
+        {aiConsent && (
+          <button type="button" className="btn-secondary" onClick={() => { withdrawRecipeConsent(); setAiConsent(false); }}>
+            {t("settings.recipes.withdraw")}
+          </button>
+        )}
+      </section>
+
       <section aria-labelledby="s-delete" className="space-y-3">
         <h2 id="s-delete" className="text-lg font-semibold">{t("settings.delete")}</h2>
         <p>{t("settings.delete.help")}</p>
-        <button type="button" onClick={wipe} className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-bad-ring bg-bad-bg px-5 py-3 text-lg font-semibold text-bad-fg">
-          <span aria-hidden="true">🗑️&nbsp;</span>{t("settings.delete")}
+        <button type="button" onClick={() => setConfirmWipe(true)} className="inline-flex min-h-10 w-full items-center justify-center rounded-full border-2 border-bad-ring bg-bad-bg px-5 py-1.5 text-sm font-semibold text-bad-fg">
+          <Icon name="trash" className="me-2 h-5 w-5" />{t("settings.delete")}
         </button>
       </section>
 
-      <section aria-labelledby="s-legal" className="space-y-2">
-        <h2 id="s-legal" className="text-lg font-semibold">{t("settings.legal")}</h2>
-        <ul className="list-inside list-disc underline">
-          <li><Link href="/privacy">{t("legal.privacy")}</Link></li>
-          <li><Link href="/terms">{t("legal.terms")}</Link></li>
-          <li><Link href="/legal">{t("legal.notice")}</Link></li>
-        </ul>
+      {confirmWipe && (
+        <Modal titleId="wipe-title" tone="danger" onClose={() => setConfirmWipe(false)}>
+          <h2 id="wipe-title" className="text-lg font-semibold">{t("settings.delete")}</h2>
+          <p className="font-medium">{t("settings.delete.confirm")}</p>
+          <p className="text-sm text-muted">{t("settings.delete.help")}</p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button type="button" className="btn-secondary flex-1" onClick={() => setConfirmWipe(false)}>{t("recipes.consent.cancel")}</button>
+            <button type="button" onClick={wipe} className="inline-flex min-h-10 flex-1 items-center justify-center rounded-full border-2 border-bad-ring bg-bad-bg px-5 py-1.5 text-sm font-semibold text-bad-fg">
+              <Icon name="trash" className="me-2 h-5 w-5" />{t("settings.delete")}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      <section aria-labelledby="s-legal" className="space-y-3">
+        <h2 id="s-legal" className="text-lg font-semibold">{t("settings.about")}</h2>
+        <LegalMenu />
       </section>
     </div>
   );

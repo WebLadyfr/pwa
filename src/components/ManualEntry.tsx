@@ -11,6 +11,7 @@ export function ManualEntry({ onCode }: { onCode: (code: string) => void }) {
   return (
     <form
       className="space-y-3"
+      data-tour="manual-entry"
       noValidate
       onSubmit={(e) => {
         e.preventDefault();

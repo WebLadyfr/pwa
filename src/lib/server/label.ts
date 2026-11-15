@@ -32,6 +32,8 @@ RÈGLES STRICTES :
 export type LabelOutcome =
   | { kind: "ok"; product: NormalizedProduct }
   | { kind: "unreadable" }
+  /** Service non utilisable (clé absente/refusée, modèle introuvable) : message dédié côté client, cause dans les journaux serveur. */
+  | { kind: "unavailable" }
   | { kind: "error" };
 
 /** Valide strictement la sortie du modèle (elle est non fiable au même titre qu'OFF). */
@@ -70,7 +72,10 @@ export function parseModelOutput(text: string): LabelOutcome {
 
 export async function analyzeLabel(image: Uint8Array, mediaType: ImageType): Promise<LabelOutcome> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return { kind: "error" }; // pas de détail côté client
+  if (!apiKey) {
+    console.error("[label] ANTHROPIC_API_KEY manquante : lecture d'étiquette indisponible."); // aucun contenu utilisateur journalisé
+    return { kind: "unavailable" };
+  }
 
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), 25_000);
@@ -99,11 +104,23 @@ export async function analyzeLabel(image: Uint8Array, mediaType: ImageType): Pro
       signal: ctl.signal,
       cache: "no-store",
     });
-    if (!res.ok) return { kind: "error" };
+    if (!res.ok) {
+      // Journalisé : le code HTTP et le type/message d'erreur de l'API (jamais l'image ni le contenu de la photo).
+      // 400 « credit balance too low » = crédit épuisé, 401/403 = clé refusée, 404 = modèle inconnu, 429 = quota.
+      let detail = "";
+      try {
+        const j = (await res.json()) as { error?: { type?: unknown; message?: unknown } };
+        detail = ` ${String(j.error?.type ?? "")} ${String(j.error?.message ?? "").slice(0, 160)}`.trimEnd();
+      } catch { /* corps illisible : le code suffit */ }
+      console.error(`[label] API Anthropic : HTTP ${res.status}${detail ? ` ${detail}` : ""}`);
+      // Problème de configuration, de crédit ou de quota (pas de la faute de la personne, ni passager) : message dédié « indisponible ».
+      return [400, 401, 402, 403, 404, 429].includes(res.status) ? { kind: "unavailable" } : { kind: "error" };
+    }
     const data = (await res.json()) as { content?: { type?: string; text?: string }[] };
     const text = data.content?.find((c) => c.type === "text")?.text;
     return typeof text === "string" ? parseModelOutput(text) : { kind: "error" };
-  } catch {
+  } catch (e) {
+    console.error(`[label] appel API impossible : ${(e as { name?: string })?.name ?? "erreur"}`);
     return { kind: "error" };
   } finally {
     clearTimeout(timer);
