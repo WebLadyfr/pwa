@@ -11,7 +11,7 @@ Légende : ✅ fait dans le code (vérifié pendant le développement) · ☐ à
 - ☐ Vérifier les logs Vercel (retention, pas de body logging) et désactiver tout log d'IP non nécessaire.
 
 ## Backend / API (OWASP A01, A03, A04, A05, A10)
-- ✅ `/api/label` : même origine obligatoire, type + taille validés **avant** lecture, lecture bornée, vérification des magic bytes = type déclaré, rate limit, plafond quotidien, timeout 25 s, erreurs génériques.
+- ✅ `/api/label` et `/api/plate` (même code, `photo-route.ts`) : même origine obligatoire, type + taille validés **avant** lecture, lecture bornée, vérification des magic bytes = type déclaré, rate limit, plafond quotidien, timeout 25 s, erreurs génériques.
 - ✅ Image jamais écrite sur disque ni mise en cache (`no-store`), référence libérée après usage.
 - ✅ Prompt injection : le texte de l'image est déclaré « donnée », la sortie est validée strictement (regex de tags, pas de HTML).
 - ✅ `/api/product` : GTIN validé (format + chiffre de contrôle) avant tout appel sortant (pas de SSRF : hôte OFF fixe).

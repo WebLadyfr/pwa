@@ -40,7 +40,7 @@ export function FavoriteButton({ product, compact = false }: { product: Normaliz
         aria-pressed={fav}
         aria-label={label}
         title={label}
-        className={`inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border-2 border-primary text-primary ${fav ? "bg-primary-soft" : "bg-surface"}`}
+        className={`inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border-2 border-primary-ink text-primary-ink ${fav ? "bg-primary-soft" : "bg-surface"}`}
       >
         <Icon name="heart" filled={fav} className="h-5 w-5" />
       </button>

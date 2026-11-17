@@ -41,9 +41,9 @@ const PAIRS: [string, string, number, string][] = [
   ["ink", "surface", 4.5, "texte dans les cartes"],
   ["muted", "canvas", 4.5, "texte secondaire"],
   ["muted", "surface", 4.5, "texte secondaire dans les cartes"],
-  ["primary", "canvas", 4.5, "titre de l'app"],
-  ["primary", "surface", 4.5, "boutons secondaires, liens, navigation"],
-  ["primary", "primary-soft", 4.5, "bouton secondaire survolé, favori actif"],
+  ["primary-ink", "canvas", 4.5, "titre de l'app"],
+  ["primary-ink", "surface", 4.5, "boutons secondaires, liens, navigation"],
+  ["primary-ink", "primary-soft", 4.5, "bouton secondaire survolé, favori actif"],
   ["on-primary", "primary", 4.5, "boutons principaux, onglet actif"],
   ["on-primary", "primary-hover", 4.5, "bouton principal survolé"],
   ["ok-fg", "ok-bg", 4.5, "score vert"],
@@ -60,9 +60,11 @@ const PAIRS: [string, string, number, string][] = [
   ["ok-ring", "ok-bg", 3, "bordure sur fond vert"],
   ["warn-ring", "warn-bg", 3, "bordure sur fond orange"],
   ["bad-ring", "bad-bg", 3, "bordure sur fond rouge"],
+  ["header-fg", "header-bg", 3, "nom de la marque dans l'en-tête (grand texte)"],
+  ["footer-fg", "footer-bg", 4.5, "pied de page"],
   ["line-strong", "surface", 3, "bordure des champs de saisie"],
   ["line-strong", "canvas", 3, "bordure des champs de saisie (fond de page)"],
-  ["primary", "surface", 3, "contour de focus / sélection"],
+  ["primary-ink", "surface", 3, "contour de focus / sélection"]
 ];
 
 describe.each(["light", "dark"] as const)("contrastes WCAG AA — thème %s", (name) => {

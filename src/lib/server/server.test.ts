@@ -23,6 +23,11 @@ describe("rate limit", () => {
     expect(dailyBudgetOk(2)).toBe(true);
     expect(dailyBudgetOk(2)).toBe(false);
   });
+  it("plafond quotidien : un compteur par clé (étiquette / assiette)", () => {
+    expect(dailyBudgetOk(1, "label")).toBe(true);
+    expect(dailyBudgetOk(1, "label")).toBe(false);
+    expect(dailyBudgetOk(1, "plate")).toBe(true);
+  });
 });
 
 describe("validation d'image (magic bytes)", () => {

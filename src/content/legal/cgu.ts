@@ -5,7 +5,7 @@ export const CGU: LegalBlock[] = [
   {
     "h": "1. Objet",
     "p": [
-      "L'application « Immulea » permet de scanner un produit alimentaire et d'afficher une analyse indicative de sa composition au regard de critères de bien-être alimentaire."
+      "L'application « Oleamune » permet de scanner un produit alimentaire et d'afficher une analyse indicative de sa composition au regard de critères de bien-être alimentaire."
     ]
   },
   {

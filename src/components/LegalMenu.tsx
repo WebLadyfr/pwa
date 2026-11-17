@@ -8,7 +8,7 @@ const ROW = "press flex min-h-12 items-center gap-3 rounded-2xl bg-surface px-4 
 function Row({ icon, children }: { icon: IconName; children: React.ReactNode }) {
   return (
     <>
-      <Icon name={icon} className="h-5 w-5 shrink-0 text-primary" />
+      <Icon name={icon} className="h-5 w-5 shrink-0 text-primary-ink" />
       <span className="min-w-0 flex-1">{children}</span>
       <Icon name="chevron-right" className="h-5 w-5 shrink-0 text-muted rtl:rotate-180" />
     </>

@@ -67,9 +67,18 @@ export async function fetchAlternative(code: string, ruleSet: RuleSet, currentSc
 }
 
 export async function sendLabelImage(blob: Blob): Promise<FetchOutcome> {
+  return sendPhoto("/api/label", blob);
+}
+
+/** Photo d'assiette : mêmes garanties (aucun stockage), mais le serveur identifie les aliments au lieu de lire une étiquette. */
+export async function sendPlateImage(blob: Blob): Promise<FetchOutcome> {
+  return sendPhoto("/api/plate", blob);
+}
+
+async function sendPhoto(url: string, blob: Blob): Promise<FetchOutcome> {
   if (typeof navigator !== "undefined" && !navigator.onLine) return { kind: "offline" };
   try {
-    const res = await fetch("/api/label", { method: "POST", headers: { "Content-Type": blob.type }, body: blob });
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type": blob.type }, body: blob });
     // 503 = lecture de photos indisponible (service non configuré, budget du jour atteint) : message dédié.
     if (res.status === 503) return { kind: "label_unavailable" };
     // 502 = l'analyse a échoué (ce n'est PAS la base de produits qui est en cause) : message d'analyse générique.

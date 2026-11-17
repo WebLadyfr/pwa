@@ -1,11 +1,11 @@
 /* Service worker : coquille d'app hors-ligne.
  * RÈGLES DE CONFIDENTIALITÉ : jamais de cache pour /api/* (produits, photos d'étiquettes),
  * aucune donnée utilisateur n'est mise en cache. */
-const CACHE = "hs-shell-v4";
+const CACHE = "hs-shell-v5";
 const PRECACHE = ["/offline.html", "/theme-init.js", "/icons/icon-192.png"];
 // Pages légales : mises en cache dès l'installation (lisibles hors ligne même si jamais ouvertes).
 const LEGAL_PAGES = ["/legal/mentions", "/legal/cgu", "/legal/confidentialite", "/legal/avertissement", "/legal/licences"];
-const CACHEABLE_PAGES = new Set(["/", "/search", "/label", "/favorites", "/fridge", "/recipes", "/history", "/settings", "/onboarding", "/privacy", "/terms", "/legal", ...LEGAL_PAGES]);
+const CACHEABLE_PAGES = new Set(["/", "/search", "/label", "/plate","/favorites", "/fridge", "/recipes", "/history", "/settings", "/onboarding", "/privacy", "/terms", "/legal", ...LEGAL_PAGES]);
 
 self.addEventListener("install", (e) => {
   e.waitUntil(

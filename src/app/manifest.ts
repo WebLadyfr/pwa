@@ -2,16 +2,16 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Immulea",
-    short_name: "Immulea",
+    name: "Oleamune",
+    short_name: "Oleamune",
     description: "Scannez un produit alimentaire et comprenez sa composition. Information bien-être indicative.",
     start_url: "/",
     scope: "/",
     display: "standalone",
     orientation: "portrait",
     lang: "fr",
-    background_color: "#f6f8f2",
-    theme_color: "#376f1d",
+    background_color: "#ffffff",
+    theme_color: "#cad158",
     categories: ["food", "health", "lifestyle"],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

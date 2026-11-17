@@ -36,22 +36,21 @@ export function intFromEnv(name: string, fallback: number): number {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
-/** Garde-fou de coût : plafond quotidien global (par instance). */
-let day = "";
-let used = 0;
-export function dailyBudgetOk(max: number, now = new Date()): boolean {
+/** Garde-fou de coût : plafond quotidien global (par instance), un compteur par `key` (ex. étiquette / assiette). */
+const budgets = new Map<string, { day: string; used: number }>();
+export function dailyBudgetOk(max: number, key = "default", now = new Date()): boolean {
   const d = now.toISOString().slice(0, 10);
-  if (d !== day) {
-    day = d;
-    used = 0;
+  let b = budgets.get(key);
+  if (!b || b.day !== d) {
+    b = { day: d, used: 0 };
+    budgets.set(key, b);
   }
-  if (used >= max) return false;
-  used += 1;
+  if (b.used >= max) return false;
+  b.used += 1;
   return true;
 }
 
 export function __resetForTests() {
   buckets.clear();
-  day = "";
-  used = 0;
+  budgets.clear();
 }

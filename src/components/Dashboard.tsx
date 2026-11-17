@@ -79,7 +79,7 @@ export function Dashboard() {
     <div className="space-y-7">
       <form onSubmit={submit} role="search" data-tour="search-bar" noValidate className="space-y-2">
         <label htmlFor="home-q" className="sr-only">{t("search.label")}</label>
-        <div className="flex items-center gap-2 rounded-full border-2 border-line-strong bg-surface p-1.5 ps-4 focus-within:border-primary">
+        <div className="flex items-center gap-2 rounded-full border-2 border-line-strong bg-surface p-1 ps-3 focus-within:border-primary-ink">
           <Icon name="search" className="h-5 w-5 text-muted" />
           <input
             id="home-q"
@@ -94,24 +94,24 @@ export function Dashboard() {
             onChange={(e) => { setQ(e.target.value); setInvalid(false); }}
             aria-invalid={invalid}
             aria-describedby={invalid ? "home-q-err" : undefined}
-            className="min-h-10 min-w-0 flex-1 bg-transparent text-base outline-none"
+            className="min-h-8 min-w-0 flex-1 bg-transparent text-sm outline-none"
           />
-          <button type="submit" className="press min-h-10 shrink-0 rounded-[2rem] bg-primary px-4 text-sm font-semibold text-on-primary">{t("home.search.go")}</button>
+          <button type="submit" className="press min-h-8 shrink-0 rounded-[2rem] bg-primary px-3 text-sm font-semibold text-on-primary">{t("home.search.go")}</button>
         </div>
         {invalid && <p id="home-q-err" role="alert" className="text-bad-fg">{t("search.invalid")}</p>}
       </form>
 
-      <nav aria-label={t("home.quick")} className="grid grid-cols-2 gap-2.5">
-        <Link href="/scan" className="press btn-primary col-span-2"><Icon name="scan" className="h-4 w-4" />{t("home.scan")}</Link>
-        <Link href="/label" data-tour="tile-label" className="press btn-secondary !px-3 !text-sm"><Icon name="tag" className="h-4 w-4" />{t("nav.label")}</Link>
-        <Link href="/fridge" className="press btn-secondary !px-3 !text-sm"><Icon name="fridge" className="h-4 w-4" />{t("nav.fridge")}</Link>
-        <Link href="/symptoms" className="press btn-secondary !px-3 !text-sm"><Icon name="clipboard" className="h-4 w-4" />{t("nav.symptoms")}</Link>
-        <Link href="/history" className="press btn-secondary !px-3 !text-sm"><Icon name="clock" className="h-4 w-4" />{t("nav.history")}</Link>
+      <nav aria-label={t("home.quick")} className="grid grid-cols-2 gap-2.5 [&_a]:!w-full [&_a]:!min-w-0 [&_a]:!whitespace-normal">
+        <Link href="/scan" className="press btn-primary btn-alt col-span-2 !min-h-12 !max-w-[18rem] !text-xl"><Icon name="scan" className="!text-lg h-4 w-4" />{t("home.scan")}</Link>
+        <Link href="/label" data-tour="tile-label" className="press btn-secondary !px-3 !text-base"><Icon name="tag" className="h-4 w-4" />{t("nav.label")}</Link>
+        <Link href="/scan?mode=plate" className="press btn-secondary !px-3 !text-base"><Icon name="utensils" className="h-4 w-4" />{t("nav.plate")}</Link>
+        <Link href="/fridge" className="press btn-secondary !px-3 !text-base"><Icon name="fridge" className="h-4 w-4" />{t("nav.fridge")}</Link>
+        <Link href="/history" className="press btn-secondary !px-3 !text-base"><Icon name="clock" className="h-4 w-4" />{t("nav.history")}</Link>
       </nav>
 
       <DietSwitch />
 
-      <section aria-labelledby="dash-progress" className="space-y-4 rounded-2xl bg-surface p-4 shadow-sm" data-tour="progress">
+      <section aria-labelledby="dash-progress" className="space-y-4 rounded-2xl border border-line bg-surface p-4 shadow-sm" data-tour="progress">
         <h2 id="dash-progress" className="font-semibold">{t("dash.title")}</h2>
         {!enabled ? (
           <p>{t("dash.disabled")} <Link href="/settings" className="underline">{t("nav.settings")}</Link></p>

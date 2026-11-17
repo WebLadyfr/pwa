@@ -8,7 +8,7 @@ export const AVERTISSEMENT: LegalBlock[] = [
   {
     h: "Ce que fait l'application",
     p: [
-      "Immulea lit la composition d'un aliment et affiche un score **indicatif** fondé sur des critères alimentaires de bien-être. Ces critères sont rédigés d'après des sources publiques et doivent être validés par un professionnel de santé ([À COMPLÉTER : relecture médicale]).",
+      "Oleamune lit la composition d'un aliment et affiche un score **indicatif** fondé sur des critères alimentaires de bien-être. Ces critères sont rédigés d'après des sources publiques et doivent être validés par un professionnel de santé ([À COMPLÉTER : relecture médicale]).",
     ],
   },
   {

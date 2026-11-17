@@ -8,7 +8,7 @@ import { t } from "@/i18n";
  */
 export function LegalConsentLine() {
   const link = (href: string, label: string) => (
-    <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline underline-offset-2">{label}</a>
+    <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-primary-ink underline underline-offset-2">{label}</a>
   );
   const parts: ReactNode[] = t("onboarding.legal.sentence").split(/(\{terms\}|\{privacy\})/).map((p) => {
     if (p === "{terms}") return link("/legal/cgu", t("legal.terms"));

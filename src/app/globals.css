@@ -9,19 +9,23 @@
  * si vous changez une valeur, relancez `npm test`. Les trois blocs sombres doivent rester identiques.
  */
 :root {
-  --canvas: #f6f8f2;
+  --canvas: #ffffff;
   --surface: #ffffff;
   --ink: #2a2118;
   --muted: #56445d;
-  --line: #d6d9cc;
-  --line-strong: #6b6f5f;
-  --primary: #376f1d;
-  --on-primary: #ffffff;
-  --primary-hover: #2c5917;
-  --primary-soft: #e6f0de;
-  --accent: #64ab44;
-  --brand: #563117;
-  --footer-bg: #56445d;
+  --line: #d9dcae;
+  --line-strong: #6b6f4a;
+  --primary: #cad158;
+  --primary-ink: #4f5511;
+  --on-primary: #1f2306;
+  --primary-hover: #b8bf47;
+  --primary-soft: #f1f5d3;
+  --accent: #cad158;
+  --brand: #631606;
+  --header-bg: #cad158;
+  --alt: #959439;
+  --header-fg: #631606;
+  --footer-bg: #631606;
   --footer-fg: #ffffff;
   --ok-bg: #e4f4e8;
   --ok-fg: #14532d;
@@ -36,19 +40,23 @@
 }
 
 html[data-theme="dark"] {
-  --canvas: #12190f;
-  --surface: #1b2518;
+  --canvas: #14160a;
+  --surface: #1e2110;
   --ink: #eef2ea;
   --muted: #d2c6d8;
-  --line: #34422e;
-  --line-strong: #8a9a82;
-  --primary: #8fcf6e;
-  --on-primary: #10200a;
-  --primary-hover: #a8dc8d;
-  --primary-soft: #26351f;
-  --accent: #64ab44;
-  --brand: #e0c2a6;
-  --footer-bg: #56445d;
+  --line: #3a3f1e;
+  --line-strong: #9aa070;
+  --primary: #cad158;
+  --on-primary: #1c1f05;
+  --primary-hover: #dbe07a;
+  --primary-soft: #2b2f12;
+  --primary-ink: #cad158;
+  --header-bg: #cad158;
+  --alt: #959439;
+  --header-fg: #631606;
+  --accent: #cad158;
+  --brand: #e6c9b8;
+  --footer-bg: #631606;
   --footer-fg: #ffffff;
   --ok-bg: #123524;
   --ok-fg: #b7f0cb;
@@ -64,19 +72,23 @@ html[data-theme="dark"] {
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) {
-    --canvas: #12190f;
-    --surface: #1b2518;
+    --canvas: #14160a;
+    --surface: #1e2110;
     --ink: #eef2ea;
     --muted: #d2c6d8;
-    --line: #34422e;
-    --line-strong: #8a9a82;
-    --primary: #8fcf6e;
-    --on-primary: #10200a;
-    --primary-hover: #a8dc8d;
-    --primary-soft: #26351f;
-    --accent: #64ab44;
-    --brand: #e0c2a6;
-    --footer-bg: #56445d;
+    --line: #3a3f1e;
+    --line-strong: #9aa070;
+    --primary: #cad158;
+    --on-primary: #1c1f05;
+    --primary-hover: #dbe07a;
+    --primary-soft: #2b2f12;
+    --primary-ink: #cad158;
+    --header-bg: #cad158;
+    --alt: #959439;
+  --header-fg: #631606;
+    --accent: #cad158;
+    --brand: #e6c9b8;
+    --footer-bg: #631606;
     --footer-fg: #ffffff;
     --ok-bg: #123524;
     --ok-fg: #b7f0cb;
@@ -100,16 +112,19 @@ html[data-text="xlarge"] { font-size: 137.5%; }
 
 @layer base {
   body { @apply bg-canvas text-ink antialiased; overflow-wrap: anywhere; }
-  :focus-visible { @apply outline-4 outline-offset-2 outline-primary; }
+  :focus-visible { @apply outline-4 outline-offset-2 outline-primary-ink; }
 }
 
 @layer components {
   /* Cibles tactiles >= 2,75rem (44 px au réglage normal), contraste >= 4.5:1 */
-  .btn-primary { @apply mx-auto inline-flex min-h-10 w-full max-w-[15rem] items-center justify-center gap-1.5 rounded-[2rem] bg-primary px-6 py-1.5 text-center text-sm font-semibold text-on-primary; }
+  .btn-primary { @apply mx-auto flex min-h-10 w-fit min-w-[15rem] max-w-full whitespace-nowrap items-center justify-center gap-1.5 rounded-[2rem] bg-primary px-6 py-1.5 text-center text-sm font-semibold text-on-primary; }
   .btn-primary:hover { @apply bg-primary-hover; }
-  .btn-secondary { @apply mx-auto inline-flex min-h-10 w-full max-w-[15rem] items-center justify-center gap-1.5 rounded-[2rem] border-2 border-primary bg-surface px-5 py-1.5 text-center text-sm font-semibold text-primary; }
-  .btn-secondary:hover { @apply bg-primary-soft; }
+  .btn-secondary { @apply mx-auto flex min-h-10 w-fit min-w-[15rem] max-w-full whitespace-nowrap items-center justify-center gap-1.5 rounded-[2rem] border-2 border-primary-ink bg-primary px-5 py-1.5 text-center text-sm font-semibold text-on-primary; }
+  .btn-secondary:hover { @apply bg-primary-hover; }
   .btn-secondary:disabled { @apply cursor-not-allowed opacity-50; }
+  /* Variante olive #959439 : le 2e bouton quand il y en a deux, et « Scanner un produit ». */
+  .btn-alt, .btn-alt:hover, .btn-alt:active:not(:disabled) { background-color: var(--alt); }
+  .btn-alt:hover { filter: brightness(1.08); }
   .h-18 { height: 4.5rem; } .w-18 { width: 4.5rem; }
 
   /* Effet d'appui : le bouton « s'enfonce » légèrement (et le téléphone vibre brièvement, voir PressFeedback). */
@@ -121,7 +136,7 @@ html[data-text="xlarge"] { font-size: 137.5%; }
     transform: scale(0.96);
   }
   .btn-primary:active:not(:disabled) { @apply bg-primary-hover; }
-  .btn-secondary:active:not(:disabled) { @apply bg-primary-soft; }
+  .btn-secondary:active:not(:disabled) { @apply bg-primary-hover; }
 }
 
 @media (prefers-reduced-motion: reduce) {

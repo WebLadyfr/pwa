@@ -47,7 +47,7 @@ export function Modal({ titleId, onClose, tone = "info", children }: {
         aria-labelledby={titleId}
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        className={`max-h-[90vh] w-full max-w-md space-y-4 overflow-y-auto rounded-2xl border-2 bg-surface p-5 text-ink shadow-2xl outline-none ${tone === "danger" ? "border-bad-ring" : "border-primary"}`}
+        className={`max-h-[90vh] w-full max-w-md space-y-4 overflow-y-auto rounded-2xl border-2 bg-surface p-5 text-ink shadow-2xl outline-none ${tone === "danger" ? "border-bad-ring" : "border-primary-ink"}`}
       >
         {children}
       </div>

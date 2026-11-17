@@ -46,7 +46,7 @@ function ReasonItem({ r, showProfiles }: { r: Reason; showProfiles: boolean }) {
   );
 }
 
-export function ResultScreen({ product, source }: { product: NormalizedProduct; source: "barcode" | "label" }) {
+export function ResultScreen({ product, source }: { product: NormalizedProduct; source: "barcode" | "label" | "plate" }) {
   const ruleSet = useMemo(() => getActiveRuleSet(), []);
   const result = useMemo(() => evaluate(product, ruleSet), [product, ruleSet]);
   const profileCount = useMemo(() => getProfileIds().length, []);
@@ -83,7 +83,7 @@ export function ResultScreen({ product, source }: { product: NormalizedProduct; 
   const halal = useMemo(() => halalStatus(product), [product]);
   const gi = useMemo(() => estimateGlycemicIndex(product), [product]);
   const testMode = useMemo(() => getDietMode() === "test", []);
-  const title = product.name ?? (source === "label" ? t("label.result.name") : t("result.unknownName"));
+  const title = product.name ?? (source === "label" ? t("label.result.name") : source === "plate" ? t("plate.result.name") : t("result.unknownName"));
 
   return (
     <div className="space-y-5">
@@ -109,6 +109,7 @@ export function ResultScreen({ product, source }: { product: NormalizedProduct; 
         <>
           <ScoreBadge score={result.score} level={result.level} />
           <MedicalNote />
+          {source === "plate" && <p role="note" className="rounded-xl bg-primary-soft p-3 text-sm">{t("plate.estimate")}</p>}
           <section aria-labelledby="why">
             <h2 id="why" className="mb-2 text-lg font-semibold">{t("result.why")}</h2>
             {result.reasons.length === 0 ? (
@@ -118,7 +119,7 @@ export function ResultScreen({ product, source }: { product: NormalizedProduct; 
             )}
           </section>
           {testMode && result.reasons.some((r) => r.points < 0) && (
-            <section role="note" className="space-y-2 rounded-2xl border-2 border-primary bg-primary-soft p-4">
+            <section role="note" className="space-y-2 rounded-2xl border-2 border-primary-ink bg-primary-soft p-4">
               <p><Icon name="flask" className="me-1.5 h-5 w-5 align-[-0.2em]" />{t("diet.test.hint")}</p>
               <Link href="/symptoms" className="btn-secondary">{t("diet.test.cta")}</Link>
             </section>
@@ -176,7 +177,7 @@ export function ResultScreen({ product, source }: { product: NormalizedProduct; 
       {alt && alt !== "loading" && (
         <section aria-labelledby="alt" className="rounded-2xl bg-primary-soft p-4">
           <h2 id="alt" className="font-semibold">{t("result.alt.title")}</h2>
-          <Link href={`/product/${alt.code}`} className="mt-1 block text-primary underline underline-offset-2">
+          <Link href={`/product/${alt.code}`} className="mt-1 block text-primary-ink underline underline-offset-2">
             {alt.name}{alt.brands ? ` — ${alt.brands}` : ""}
           </Link>
           <p className="text-sm">{t("result.alt.score", { score: alt.score })}</p>

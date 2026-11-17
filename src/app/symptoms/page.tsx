@@ -54,8 +54,8 @@ export default function SymptomsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{t("symptoms.title")}</h1>
+    <div className="space-y-6 text-lg [&_.btn-primary]:!min-h-12 [&_.btn-primary]:!text-lg [&_.btn-secondary]:!min-h-12 [&_.btn-secondary]:!text-lg">
+      <h1 className="text-2xl font-semibold">{t("symptoms.title")}</h1>
       <p>{t("symptoms.intro")}</p>
 
       {!enabled ? (
@@ -67,7 +67,7 @@ export default function SymptomsPage() {
           <section aria-labelledby="sy-week" className="space-y-2 rounded-2xl bg-surface p-4 shadow-sm">
             <h2 id="sy-week" className="font-semibold">{t("symptoms.week")}</h2>
             <DayBars label={t("symptoms.week")} days={weekDays} valueText={(d) => `${d.long} : ${d.avg === null ? t("symptoms.none") : d.avg.toFixed(1)}`} />
-            <p className="text-sm text-muted">{t("symptoms.week.count", { n: days7 })}</p>
+            <p className="text-base text-muted">{t("symptoms.week.count", { n: days7 })}</p>
           </section>
 
           <form onSubmit={save} className="space-y-5">
@@ -78,7 +78,7 @@ export default function SymptomsPage() {
                   {SCALE.map((n) => (
                     <label
                       key={n}
-                      className="press flex min-h-12 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-line-strong bg-surface text-center has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-on-primary"
+                      className="press flex min-h-12 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-line-strong bg-surface text-center has-[:checked]:border-primary-ink has-[:checked]:bg-primary has-[:checked]:text-on-primary"
                     >
                       <input
                         type="radio"
@@ -89,22 +89,22 @@ export default function SymptomsPage() {
                         className="sr-only"
                       />
                       <Icon name={`face${n}` as IconName} className="h-6 w-6" />
-                      <span className="text-sm font-semibold">{n}</span>
+                      <span className="text-base font-semibold">{n}</span>
                     </label>
                   ))}
                 </div>
               </fieldset>
             ))}
-            <p className="text-sm text-muted">{t("symptoms.scale")}</p>
+            <p className="text-base text-muted">{t("symptoms.scale")}</p>
             <button type="submit" disabled={!complete} className="btn-primary disabled:cursor-not-allowed disabled:opacity-50">
               {t("symptoms.save")}
             </button>
-            {!complete && <p className="text-sm text-muted">{t("symptoms.incomplete")}</p>}
+            {!complete && <p className="text-base text-muted">{t("symptoms.incomplete")}</p>}
             {saved && <p role="status" className="font-medium text-ok-fg"><Icon name="check" className="me-1 h-4 w-4 align-[-0.15em]" />{t("symptoms.saved")}</p>}
           </form>
 
           <section aria-labelledby="sy-hist" className="space-y-2">
-            <h2 id="sy-hist" className="text-lg font-semibold">{t("symptoms.history")}</h2>
+            <h2 id="sy-hist" className="text-xl font-semibold">{t("symptoms.history")}</h2>
             {entries.length === 0 ? (
               <p>{t("symptoms.empty")}</p>
             ) : (
@@ -112,7 +112,7 @@ export default function SymptomsPage() {
                 {entries.slice(0, 7).map((e) => (
                   <li key={e.date} className="rounded-xl bg-surface p-3 shadow-sm">
                     <p className="font-medium">{new Date(`${e.date}T12:00:00`).toLocaleDateString(dateLocale(), { weekday: "long", day: "numeric", month: "long" })}</p>
-                    <p className="text-sm text-muted">
+                    <p className="text-base text-muted">
                       {SYMPTOM_KEYS.map((k) => `${t(`symptoms.${k}.short`)} ${e.scores[k]}/5`).join(" · ")}
                     </p>
                   </li>
@@ -123,7 +123,7 @@ export default function SymptomsPage() {
         </>
       )}
 
-      <p role="note" className="text-sm text-muted">{t("symptoms.disclaimer")}</p>
+      <p role="note" className="text-base text-muted">{t("symptoms.disclaimer")}</p>
     </div>
   );
 }

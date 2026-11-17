@@ -20,7 +20,7 @@ export function ManualEntry({ onCode }: { onCode: (code: string) => void }) {
         else setInvalid(true);
       }}
     >
-      <h2 className="text-lg font-semibold">{t("scan.manual.title")}</h2>
+      <h2 className="text-xl font-semibold">{t("scan.manual.title")}</h2>
       <label htmlFor="manual-code" className="block">{t("scan.manual.label")}</label>
       <input
         id="manual-code"
@@ -31,7 +31,7 @@ export function ManualEntry({ onCode }: { onCode: (code: string) => void }) {
         onChange={(e) => { setValue(e.target.value); setInvalid(false); }}
         aria-invalid={invalid}
         aria-describedby={invalid ? "manual-err" : undefined}
-        className="w-full rounded-xl border-2 border-line-strong bg-surface p-3 text-lg tracking-wider"
+        className="w-full rounded-xl border-2 border-line-strong bg-surface p-3 text-xl tracking-wider"
       />
       {invalid && <p id="manual-err" role="alert" className="text-bad-fg">{t("scan.manual.invalid")}</p>}
       <button type="submit" className="btn-secondary">{t("scan.manual.submit")}</button>

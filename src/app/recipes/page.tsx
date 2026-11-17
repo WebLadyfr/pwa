@@ -29,7 +29,7 @@ export default function SavedRecipesPage() {
   if (recipes === null) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 [&_.btn-primary]:!min-h-12 [&_.btn-primary]:!text-lg [&_.btn-secondary]:!min-h-12 [&_.btn-secondary]:!text-lg">
       <h1 className="text-xl font-semibold">{t("recipes.saved.title")}</h1>
       {!enabled && <p>{t("recipes.saved.disabled")} <Link href="/settings" className="underline">{t("nav.settings")}</Link></p>}
       {enabled && recipes.length === 0 && <p>{t("recipes.saved.empty")}</p>}
@@ -44,7 +44,7 @@ export default function SavedRecipesPage() {
           </ul>
         </>
       )}
-      <Link href="/fridge" className="btn-secondary">{t("nav.fridge")}</Link>
+      <Link href="/fridge" className="btn-secondary btn-alt">{t("nav.fridge")}</Link>
     </div>
   );
 }

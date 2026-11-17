@@ -47,6 +47,8 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
 
       {step >= 1 && (
         <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-horizontal.svg" alt={t("app.name")} width={1504} height={512} className="mx-auto h-auto w-full max-w-xs" />
           {deleted && <p role="status" className="rounded-xl bg-primary-soft p-3">{t("onboarding.deleted")}</p>}
           <h1 id="ob-title" ref={titleRef} tabIndex={-1} className="text-2xl font-bold">{t("onboarding.welcome.title")}</h1>
           <p className="text-lg">{t("onboarding.welcome.body")}</p>
@@ -60,7 +62,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           </p>
           <ProfilePicker ids={profileIds} selected={profiles} onToggle={toggleProfile} label={t("onboarding.profile.title")} />
           <p className="text-sm text-muted">{t("onboarding.profile.more")}</p>
-          <button type="button" className="btn-primary" disabled={profiles.length === 0} onClick={() => setStep(2)}>{t("onboarding.welcome.start")}</button>
+          <button type="button" className="btn-primary text-lg font-bold" disabled={profiles.length === 0} onClick={() => setStep(2)}>{t("onboarding.welcome.start")}</button>
         </>
       )}
 
@@ -77,7 +79,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           </label>
           {!ack && <p id="ack-help" className="text-sm text-muted">{t("onboarding.ack.required")}</p>}
 
-          <div className="space-y-3 rounded-2xl border-2 border-primary bg-surface p-4">
+          <div className="space-y-3 rounded-2xl border-2 border-primary-ink bg-surface p-4">
             <h3 className="text-lg font-semibold">{t("onboarding.consent.title")}</h3>
             <p>{t("consent.body")}</p>
             <LegalConsentLine />

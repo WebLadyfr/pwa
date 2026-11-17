@@ -1,4 +1,4 @@
-# Immulea (MVP)
+# Oleamune (MVP)
 
 PWA mobile-first : on scanne un code-barres, l'app affiche un score 🟢🟠🔴 et les raisons précises.
 **Information bien-être indicative. Ne remplace pas l'avis d'un professionnel de santé. Ne constitue ni un diagnostic ni un traitement.**
@@ -37,6 +37,7 @@ src/
     api/alternatives/[code]  Meilleure alternative de la même catégorie
     api/search            Recherche par nom (POST, terme jamais journalisé)
     api/label             Point d'accès à l'API Claude (lecture d'étiquette)
+    api/plate             Idem pour la photo d'assiette (identifie les aliments)
     api/recipes           Point d'accès à l'API Claude (recettes) : même service pour scan et frigo
     fridge/ recipes/      Mon frigo (liste locale) ; recettes enregistrées (hors-ligne)
 public/sw.js, offline.html, icons/   PWA

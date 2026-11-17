@@ -1,5 +1,5 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { t } from "@/i18n";
 import { CHANGE_EVENT, needsOnboarding } from "@/lib/storage";
@@ -17,6 +17,7 @@ const OPEN_PATHS = ["/privacy", "/terms", "/legal", "/onboarding"];
  */
 export function AppGate({ children }: { children: React.ReactNode }) {
   const path = usePathname();
+  const router = useRouter();
   const [state, setState] = useState<"checking" | "need" | "ok">("checking");
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export function AppGate({ children }: { children: React.ReactNode }) {
   if (state === "need") {
     return (
       <main id="main" className="flex-1 py-5">
-        <Onboarding onDone={() => setState(needsOnboarding() ? "need" : "ok")} />
+        <Onboarding onDone={() => { setState(needsOnboarding() ? "need" : "ok"); router.replace("/"); }} />
       </main>
     );
   }

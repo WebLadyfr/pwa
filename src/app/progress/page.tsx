@@ -67,7 +67,7 @@ export default function ProgressPage() {
             role="tab"
             aria-selected={period === p}
             onClick={() => setPeriod(p)}
-            className={`press min-h-10 rounded-full px-2 text-sm font-semibold ${period === p ? "bg-primary text-on-primary" : "text-primary"}`}
+            className={`press min-h-10 rounded-full px-2 text-sm font-semibold ${period === p ? "bg-primary text-on-primary" : "text-primary-ink"}`}
           >
             {t(`progress.${p}`)}
           </button>

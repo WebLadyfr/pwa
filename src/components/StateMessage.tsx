@@ -3,14 +3,17 @@ import { t } from "@/i18n";
 import type { FetchOutcome } from "@/lib/client";
 
 /** Messages d'erreur clairs et génériques pour chaque issue non nominale. */
-export function StateMessage({ kind, onRetry }: { kind: Exclude<FetchOutcome["kind"], "ok">; onRetry?: () => void }) {
+export function StateMessage({ kind, onRetry, plate }: { kind: Exclude<FetchOutcome["kind"], "ok">; onRetry?: () => void; plate?: boolean }) {
   const map: Record<string, { title: string; body: string }> = {
     not_found: { title: t("error.notFound.title"), body: t("error.notFound.body") },
     offline: { title: t("error.offline.title"), body: t("error.offline.body") },
     upstream: { title: t("error.upstream.title"), body: t("error.upstream.body") },
     rate_limited: { title: t("error.generic.title"), body: t("error.rateLimited.body") },
-    unreadable: { title: t("error.generic.title"), body: t("label.error.unreadable") },
-    label_unavailable: { title: t("label.error.unavailable.title"), body: t("label.error.unavailable.body") },
+    unreadable: { title: t("error.generic.title"), body: t(plate ? "plate.error.unreadable" : "label.error.unreadable") },
+    label_unavailable: {
+      title: t(plate ? "plate.error.unavailable.title" : "label.error.unavailable.title"),
+      body: t(plate ? "plate.error.unavailable.body" : "label.error.unavailable.body"),
+    },
     invalid_image: { title: t("error.generic.title"), body: t("label.error.invalid") },
     error: { title: t("error.generic.title"), body: t("error.generic.body") },
   };

@@ -82,28 +82,20 @@ export default function SettingsPage() {
           <LangSwitch variant="list" />
         </div>
 
-        <fieldset className="space-y-2">
-          <legend className="mb-1 font-medium">{t("settings.theme")}</legend>
-          {THEMES.map((v) => (
-            <label key={v} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-line-strong bg-surface p-3 has-[:checked]:border-primary">
-              <input type="radio" name="theme" value={v} checked={prefs.theme === v} onChange={() => update({ theme: v })} className="h-5 w-5 accent-primary" />
-              {t(`theme.${v}`)}
-            </label>
-          ))}
-        </fieldset>
+        <div className="space-y-2">
+          <label htmlFor="pref-theme" className="block font-medium">{t("settings.theme")}</label>
+          <select id="pref-theme" value={prefs.theme} onChange={(e) => update({ theme: e.target.value as Prefs["theme"] })} className="min-h-11 w-full rounded-xl border-2 border-line-strong bg-surface px-3 text-base">
+            {THEMES.map((v) => <option key={v} value={v}>{t(`theme.${v}`)}</option>)}
+          </select>
+        </div>
 
-        <fieldset className="space-y-2">
-          <legend className="mb-1 font-medium">{t("settings.textsize")}</legend>
-          <div className="grid grid-cols-2 gap-2">
-            {TEXT_SIZES.map((v) => (
-              <label key={v} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-line-strong bg-surface p-3 has-[:checked]:border-primary">
-                <input type="radio" name="textsize" value={v} checked={prefs.textSize === v} onChange={() => update({ textSize: v })} className="h-5 w-5 shrink-0 accent-primary" />
-                {t(`text.${v}`)}
-              </label>
-            ))}
-          </div>
-          <p className="rounded-xl bg-surface p-3">{t("settings.textsize.sample")}</p>
-        </fieldset>
+        <div className="space-y-2">
+          <label htmlFor="pref-text" className="block font-medium">{t("settings.textsize")}</label>
+          <select id="pref-text" value={prefs.textSize} onChange={(e) => update({ textSize: e.target.value as Prefs["textSize"] })} className="min-h-11 w-full rounded-xl border-2 border-line-strong bg-surface px-3 text-base">
+            {TEXT_SIZES.map((v) => <option key={v} value={v}>{t(`text.${v}`)}</option>)}
+          </select>
+          <p className="rounded-xl border border-line bg-surface p-3">{t("settings.textsize.sample")}</p>
+        </div>
       </section>
 
       <section aria-labelledby="s-errors" className="space-y-3">

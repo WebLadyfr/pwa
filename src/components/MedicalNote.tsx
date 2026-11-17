@@ -8,7 +8,7 @@ export function MedicalNote() {
     <p role="note" className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
       <Icon name="info" className="h-4 w-4 shrink-0" />
       <span>{t("disclaimer.short")}</span>
-      <Link href="/legal/avertissement" className="font-medium text-primary underline underline-offset-2">{t("legal.learnmore")}</Link>
+      <Link href="/legal/avertissement" className="font-medium text-primary-ink underline underline-offset-2">{t("legal.learnmore")}</Link>
     </p>
   );
 }

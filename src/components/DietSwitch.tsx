@@ -25,7 +25,7 @@ export function DietSwitch() {
         {DIET_MODES.map((m) => (
           <label
             key={m}
-            className="press flex min-h-12 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-line-strong bg-surface p-2 text-center text-sm font-medium has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-on-primary"
+            className="press flex min-h-12 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-line-strong bg-surface p-2 text-center text-sm font-medium has-[:checked]:border-primary-ink has-[:checked]:bg-primary has-[:checked]:text-on-primary"
           >
             <input
               type="radio"

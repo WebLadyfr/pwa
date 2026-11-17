@@ -145,7 +145,7 @@ export default function FridgePage() {
             <ul aria-labelledby="fridge-sugg" className="flex flex-wrap gap-2">
               {suggestions.map((s) => (
                 <li key={s}>
-                  <button type="button" onClick={() => add(s)} className="min-h-10 rounded-full border-2 border-primary bg-surface px-4 py-1.5 text-sm text-primary">
+                  <button type="button" onClick={() => add(s)} className="min-h-10 rounded-full border-2 border-primary-ink bg-surface px-4 py-1.5 text-sm text-primary-ink">
                     <span aria-hidden="true">+ </span>{s}
                   </button>
                 </li>

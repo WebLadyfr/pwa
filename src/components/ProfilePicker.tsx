@@ -46,10 +46,10 @@ export function ProfilePicker({ ids, selected, onToggle, label }: {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-11 w-full items-center gap-2 rounded-full border-2 border-line-strong bg-surface px-4 text-start font-semibold focus-within:border-primary"
+        className="flex min-h-11 w-full items-center gap-2 rounded-full border-2 border-line-strong bg-surface px-4 text-start font-semibold focus-within:border-primary-ink"
       >
         <span className="min-w-0 flex-1 truncate">{summary || t("onboarding.profile.required")}</span>
-        <Icon name="chevron-down" className={`h-5 w-5 shrink-0 text-primary transition-transform ${open ? "rotate-180" : ""}`} />
+        <Icon name="chevron-down" className={`h-5 w-5 shrink-0 text-primary-ink transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       <p className="text-sm text-muted">{t("profile.picker.hint")}</p>
       {open && (

@@ -17,6 +17,7 @@ const MORE: { href: string; key: string; icon: IconName }[] = [
   { href: "/recipes", key: "nav.recipes", icon: "utensils" },
   { href: "/fridge", key: "nav.fridge", icon: "fridge" },
   { href: "/label", key: "nav.label", icon: "tag" },
+  { href: "/scan?mode=plate", key: "nav.plate", icon: "utensils" },
   { href: "/symptoms", key: "nav.symptoms", icon: "clipboard" },
   { href: "/history", key: "nav.history", icon: "clock" },
   { href: "/progress", key: "nav.progress", icon: "chart" },
@@ -58,7 +59,7 @@ export function Nav() {
                 href={i.href}
                 data-tour={`nav-${i.tour}`}
                 aria-current={current ? "page" : undefined}
-                className={`press flex min-h-11 flex-col items-center justify-center rounded-full px-1 text-center text-sm font-semibold leading-tight ${current ? "bg-primary text-on-primary" : "text-primary"}`}
+                className={`press flex min-h-11 flex-col items-center justify-center rounded-full px-1 text-center text-sm font-semibold leading-tight ${current ? "bg-primary text-on-primary" : "text-primary-ink"}`}
               >
                 <Icon name={i.icon} className="h-5 w-5" filled={i.icon === "heart" && current} />
                 {t(i.key)}
@@ -74,7 +75,7 @@ export function Nav() {
             aria-expanded={open}
             aria-controls="more-menu"
             onClick={() => setOpen((o) => !o)}
-            className={`press flex min-h-11 w-full flex-col items-center justify-center rounded-full px-1 text-center text-sm font-semibold leading-tight ${open || inMore ? "bg-primary text-on-primary" : "text-primary"}`}
+            className={`press flex min-h-11 w-full flex-col items-center justify-center rounded-full px-1 text-center text-sm font-semibold leading-tight ${open || inMore ? "bg-primary text-on-primary" : "text-primary-ink"}`}
           >
             <Icon name={open ? "x" : "menu"} className="h-5 w-5" />
             {t("nav.menu")}
@@ -86,7 +87,7 @@ export function Nav() {
                   <Link
                     href={m.href}
                     aria-current={path.startsWith(m.href) ? "page" : undefined}
-                    className={`press flex min-h-11 items-center gap-3 rounded-full px-4 text-base font-semibold ${path.startsWith(m.href) ? "bg-primary text-on-primary" : "text-primary"}`}
+                    className={`press flex min-h-11 items-center gap-3 rounded-full px-4 text-base font-semibold ${path.startsWith(m.href) ? "bg-primary text-on-primary" : "text-primary-ink"}`}
                   >
                     <Icon name={m.icon} className="h-5 w-5" />
                     {t(m.key)}

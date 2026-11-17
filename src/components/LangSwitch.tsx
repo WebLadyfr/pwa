@@ -34,7 +34,7 @@ export function LangSwitch({ variant = "button" }: { variant?: "button" | "list"
     return (
       <div role="radiogroup" aria-label={t("lang.title")} className="grid grid-cols-3 gap-2">
         {locales.map((l) => (
-          <label key={l} className="flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-line-strong bg-surface p-2 text-center has-[:checked]:border-primary">
+          <label key={l} className="flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-line-strong bg-surface p-2 text-center has-[:checked]:border-primary-ink">
             <input type="radio" name="lang" value={l} checked={cur === l} onChange={() => choose(l)} className="h-4 w-4 shrink-0 accent-primary" />
             <span lang={l}>{LOCALE_NAMES[l]}</span>
           </label>
@@ -52,7 +52,7 @@ export function LangSwitch({ variant = "button" }: { variant?: "button" | "list"
         aria-haspopup="true"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="press inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border-2 border-line bg-surface px-3 text-sm font-semibold text-primary"
+        className="press inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border-2 border-line bg-surface px-3 text-sm font-semibold text-primary-ink"
       >
         <Icon name="languages" className="h-5 w-5" />
         <span aria-hidden="true">{cur.toUpperCase()}</span>
@@ -66,7 +66,7 @@ export function LangSwitch({ variant = "button" }: { variant?: "button" | "list"
                 lang={l}
                 aria-current={cur === l ? "true" : undefined}
                 onClick={() => choose(l)}
-                className={`press flex min-h-10 w-full items-center justify-between gap-2 rounded-full px-3 text-start ${cur === l ? "bg-primary text-on-primary" : "text-primary"}`}
+                className={`press flex min-h-10 w-full items-center justify-between gap-2 rounded-full px-3 text-start ${cur === l ? "bg-primary text-on-primary" : "text-primary-ink"}`}
               >
                 {LOCALE_NAMES[l]}
                 {cur === l && <Icon name="check" className="h-4 w-4" />}

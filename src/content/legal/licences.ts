@@ -6,7 +6,7 @@ export const LICENCES: LegalBlock[] = [
     h: "Open Food Facts (attribution obligatoire)",
     p: [
       "Les informations sur les produits (noms, ingrédients, additifs, valeurs nutritionnelles) proviennent d'**Open Food Facts** (world.openfoodfacts.org), base de données collaborative et ouverte.",
-      "Le contenu de la base est disponible sous licence **ODbL** (Open Database License) ; les données individuelles sous licence DbCL ; les images de produits sous licence CC BY-SA. Immulea n'est ni affiliée à Open Food Facts, ni approuvée par ce projet.",
+      "Le contenu de la base est disponible sous licence **ODbL** (Open Database License) ; les données individuelles sous licence DbCL ; les images de produits sous licence CC BY-SA. Oleamune n'est ni affiliée à Open Food Facts, ni approuvée par ce projet.",
       "Ces données sont fournies par des contributeurs et peuvent contenir des erreurs.",
     ],
   },

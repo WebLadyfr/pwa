@@ -54,7 +54,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           aria-pressed={fav}
           aria-label={favLabel}
           title={favLabel}
-          className={`inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border-2 border-primary text-primary ${fav ? "bg-primary-soft" : "bg-surface"}`}
+          className={`inline-flex min-h-10 min-w-10 shrink-0 items-center justify-center rounded-full border-2 border-primary-ink text-primary-ink ${fav ? "bg-primary-soft" : "bg-surface"}`}
         >
           <Icon name="heart" filled={fav} className="h-5 w-5" />
         </button>
@@ -67,7 +67,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
             {RECIPE_STATUSES.map((s) => (
               <label
                 key={s}
-                className="press flex min-h-10 cursor-pointer items-center justify-center rounded-full border-2 border-line-strong bg-surface px-1 text-center text-sm font-medium has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-on-primary"
+                className="press flex min-h-10 cursor-pointer items-center justify-center rounded-full border-2 border-line-strong bg-surface px-1 text-center text-sm font-medium has-[:checked]:border-primary-ink has-[:checked]:bg-primary has-[:checked]:text-on-primary"
               >
                 <input
                   type="radio"

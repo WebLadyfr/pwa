@@ -8,16 +8,18 @@ const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: { display: ["var(--font-display)", "ui-rounded", "system-ui", "sans-serif"] },
       colors: {
         canvas: v("canvas"),
         surface: v("surface"),
         ink: v("ink"),
         muted: v("muted"),
         line: { DEFAULT: v("line"), strong: v("line-strong") },
-        primary: { DEFAULT: v("primary"), hover: v("primary-hover"), soft: v("primary-soft") },
+        primary: { DEFAULT: v("primary"), ink: v("primary-ink"), hover: v("primary-hover"), soft: v("primary-soft") },
         "on-primary": v("on-primary"),
         accent: v("accent"),
         brand: v("brand"),
+        header: { DEFAULT: v("header-bg"), fg: v("header-fg") },
         footer: { DEFAULT: v("footer-bg"), fg: v("footer-fg") },
         ok: { bg: v("ok-bg"), fg: v("ok-fg"), ring: v("ok-ring") },
         warn: { bg: v("warn-bg"), fg: v("warn-fg"), ring: v("warn-ring") },

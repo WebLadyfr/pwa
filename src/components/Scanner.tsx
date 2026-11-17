@@ -64,7 +64,7 @@ export function Scanner({ onCode }: { onCode: (code: string) => void }) {
 
   return (
     <section aria-labelledby="scan-title" className="space-y-3">
-      <h1 id="scan-title" className="text-xl font-semibold">{t("scan.title")}</h1>
+      <h1 id="scan-title" className="text-2xl font-semibold">{t("scan.title")}</h1>
       {active ? (
         <>
           <div id={READER_ID} className="w-full overflow-hidden rounded-2xl bg-black" />

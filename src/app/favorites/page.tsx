@@ -49,7 +49,7 @@ export default function FavoritesPage() {
               type="button"
               onClick={() => removeFavorite(f.code)}
               aria-label={`${t("favorites.remove")} : ${f.product.name ?? f.code}`}
-              className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border-2 border-primary bg-primary-soft text-primary"
+              className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border-2 border-primary-ink bg-primary-soft text-primary-ink"
             >
               <Icon name="heart" filled className="h-5 w-5" />
             </button>

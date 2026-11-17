@@ -28,7 +28,7 @@ export default async function LegalDocument({ params }: { params: Promise<{ slug
         <p className="text-sm text-muted">Dernière mise à jour : <time dateTime={LEGAL_UPDATED}>{updated}</time></p>
         <Draft />
         {page.slug === "avertissement" && (
-          <p role="note" className="rounded-2xl border-2 border-primary bg-primary-soft p-4 font-semibold">{t("disclaimer", undefined, "fr")}</p>
+          <p role="note" className="rounded-2xl border-2 border-primary-ink bg-primary-soft p-4 font-semibold">{t("disclaimer", undefined, "fr")}</p>
         )}
         <LegalText blocks={page.blocks} />
       </article>

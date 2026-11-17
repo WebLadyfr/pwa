@@ -48,7 +48,7 @@ export type ConsentStatus = "granted" | "refused" | "unknown";
 export interface ConsentRecord { status: "granted" | "refused"; at: string; policyVersion: string }
 export interface HistoryEntry {
   id: string;
-  source: "barcode" | "label";
+  source: "barcode" | "label" | "plate";
   code: string | null;
   name: string | null;
   brands: string | null;
@@ -221,7 +221,7 @@ function isEntry(x: unknown): x is HistoryEntry {
   const e = x as Record<string, unknown>;
   return (
     typeof e.id === "string" &&
-    (e.source === "barcode" || e.source === "label") &&
+    (e.source === "barcode" || e.source === "label" || e.source === "plate") &&
     (e.status === "scored" || e.status === "insufficient") &&
     typeof e.at === "string" &&
     (e.score === null || typeof e.score === "number") &&

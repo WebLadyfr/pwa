@@ -15,7 +15,6 @@ const STEPS: Step[] = [
   { id: "progress", target: "progress" },
   { id: "favorites", target: "nav-favorites" },
   { id: "menu", target: "nav-menu" },
-  { id: "lang", target: "lang" },
 ];
 
 const GAP = 14; // espace entre la cible et la popup (la flèche y loge)
@@ -123,7 +122,7 @@ export function Tour() {
       {layout?.spot && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute rounded-2xl border-[3px] border-primary transition-all duration-200"
+          className="pointer-events-none absolute rounded-2xl border-[3px] border-primary-ink transition-all duration-200"
           style={{ ...layout.spot, boxShadow: "0 0 0 9999px rgba(8, 16, 15, 0.65)" }}
         />
       )}
@@ -137,14 +136,14 @@ export function Tour() {
         aria-label={t("tour.dialog")}
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        className="absolute w-[min(22rem,calc(100vw-2rem))] rounded-2xl border-2 border-primary bg-surface p-4 text-ink shadow-2xl outline-none transition-[top,left] duration-200"
+        className="absolute w-[min(22rem,calc(100vw-2rem))] rounded-2xl border-2 border-primary-ink bg-surface p-4 text-ink shadow-2xl outline-none transition-[top,left] duration-200"
         style={{ top: layout?.card.top ?? 0, left: layout?.card.left ?? 0, visibility: layout ? "visible" : "hidden" }}
       >
         {/* Flèche : carré pivoté qui dépasse du bord de la popup, orienté vers la cible. */}
         {layout && layout.side !== "center" && (
           <span
             aria-hidden="true"
-            className="absolute h-4 w-4 rotate-45 border-primary bg-surface"
+            className="absolute h-4 w-4 rotate-45 border-primary-ink bg-surface"
             style={
               layout.side === "below"
                 ? { top: -9, left: layout.arrowX - 8, borderTopWidth: 2, borderLeftWidth: 2 }
@@ -165,7 +164,7 @@ export function Tour() {
 
         <div className="mt-4 flex items-center gap-2">
           {!last && (
-            <button type="button" onClick={finish} className="min-h-10 shrink-0 rounded-full px-4 font-medium text-primary underline">
+            <button type="button" onClick={finish} className="min-h-10 shrink-0 rounded-full px-4 font-medium text-primary-ink underline">
               {t("tour.skip")}
             </button>
           )}
